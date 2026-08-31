@@ -119,6 +119,20 @@ label.field input:focus{outline:none; border-color:var(--pink)}
 .btn:active{transform:scale(.97)}
 .msg{margin:12px 0 0; min-height:1.4em; font-size:.82rem; color:var(--pink); font-weight:700}
 
+/* ── ネットに出す ── */
+.pub{
+  margin:14px 0 0; padding:18px 16px;
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  text-align:left; box-shadow:var(--shadow);
+}
+.pub h3{margin:0 0 4px; font-size:.98rem; display:flex; align-items:center; gap:8px}
+.pub > p{margin:0 0 14px; font-size:.8rem; color:var(--muted)}
+.pub .url{
+  margin:0 0 14px; padding:10px 12px; font-size:.76rem; word-break:break-all;
+  background:var(--bg); border-radius:12px; color:var(--pink); font-weight:700;
+}
+.pub .note{margin:12px 0 0; font-size:.75rem; color:var(--muted)}
+
 footer{margin-top:22px; font-size:.78rem; color:var(--muted); text-align:center}
 footer a{color:var(--pink)}
 
@@ -186,6 +200,18 @@ footer a{color:var(--pink)}
       <button class="btn ghost" id="cp" type="button">中身をコピーする</button>
     </div>
     <p class="msg" id="msg" role="status"></p>
+
+    <div class="pub">
+      <h3><span>🌐</span>ネットに出す</h3>
+      <p>ボタンを押すと GitHub の画面がひらきます。中身はもう入っているので、
+         下までスクロールして緑のボタンを押すだけです。</p>
+      <label class="field">ページの名前（英数字とハイフン）
+        <input id="slug" type="text" value="mysite" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <p class="url" id="url"></p>
+      <button class="btn" id="pub" type="button">GitHub に出す</button>
+      <p class="note">中身はボタンを押したときにコピーもされます。
+        もし GitHub の画面が空だったら、枠を長押しして貼り付けてください。</p>
+    </div>
   </section>
 
   <footer>
@@ -401,6 +427,35 @@ document.getElementById("cp").addEventListener("click", async () => {
   } catch (e) {
     say("コピーできませんでした。持ち帰るボタンをお使いください");
   }
+});
+
+/* ───── ネットに出す ───── */
+const REPO = "nakanointeria5963-alt/nobobb";   // 出し先のリポジトリ
+const BRANCH = "main";
+
+const slug = document.getElementById("slug");
+const urlBox = document.getElementById("url");
+
+const cleanSlug = () => (slug.value.toLowerCase().replace(/[^a-z0-9-]/g, "-")
+  .replace(/-+/g, "-").replace(/^-|-$/g, "") || "mysite");
+
+function showUrl(){
+  const [owner, repo] = REPO.split("/");
+  urlBox.textContent = `https://${owner}.github.io/${repo}/${cleanSlug()}/`;
+}
+slug.addEventListener("input", showUrl);
+showUrl();
+
+document.getElementById("pub").addEventListener("click", () => {
+  const html = build();
+  const path = cleanSlug() + "/index.html";
+  const target = `https://github.com/${REPO}/new/${BRANCH}`
+    + `?filename=${encodeURIComponent(path)}&value=${encodeURIComponent(html)}`;
+  // 先に窓をひらく（コピーを待つと、ブラウザに止められることがある）
+  window.open(target, "_blank", "noopener");
+  navigator.clipboard.writeText(html)
+    .then(() => say("GitHub をひらきました（中身はコピー済み）"))
+    .catch(() => say("GitHub をひらきました"));
 });
 
 paint();
