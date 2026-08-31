@@ -462,10 +462,41 @@ function preset(trade){
     slug:"mysite"
   };
 }
+/* 読み込んだ保存データを、必ずこの形に整えてから使う */
+function sanitize(s){
+  const hex = c => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c);
+  const str = v => typeof v === "string" ? v : "";
+  const strArr = (v, w) => Array.isArray(v) && v.length
+    ? v.map(x => { const r = Array.isArray(x) ? x : []; return Array.from({length:w}, (_, i) => str(r[i])); })
+    : null;
+  const d = preset(s.trade);
+  if (!hex(s.mainColor)) s.mainColor = d.mainColor;
+  if (s.accentColor != null && !hex(s.accentColor)) s.accentColor = null;
+  if (!BG_TONES[s.bgTone]) s.bgTone = d.bgTone;
+  if (!FONTS[s.font]) s.font = d.font;
+  if (!RADII[s.radius]) s.radius = d.radius;
+  if (!SECTION_STYLES[s.sectionStyle]) s.sectionStyle = d.sectionStyle;
+  if (!HERO_STYLES[s.heroStyle]) s.heroStyle = d.heroStyle;
+  s.services = strArr(s.services, 3) || d.services;
+  s.faq = strArr(s.faq, 2) || d.faq;
+  s.voice = (Array.isArray(s.voice) ? s.voice.map(str) : d.voice).slice(0, 2);
+  s.flow = (Array.isArray(s.flow) ? s.flow.map(str) : d.flow).slice(0, 8);
+  ["name","tag","greeting","quals","phone","email","line","area","hours","holiday","slug"]
+    .forEach(k => { s[k] = str(s[k]); });
+  const bools = (v, keys, def) => { const o = {}; keys.forEach(k =>
+    { o[k] = (v && typeof v === "object" && k in v) ? !!v[k] : def[k]; }); return o; };
+  s.badges = bools(s.badges, Object.keys(BADGES), d.badges);
+  s.parts = bools(s.parts, Object.keys(PARTS), d.parts);
+  const okImg = v => typeof v === "string" && v.startsWith("data:image/");
+  if (!okImg(s.heroImg)) s.heroImg = null;
+  s.works = (Array.isArray(s.works) ? s.works : [])
+    .filter(w => w && okImg(w.img)).map(w => ({ img:w.img, cap:str(w.cap) })).slice(0, 8);
+  return s;
+}
 let S = preset("denki");
 try{
   const saved = JSON.parse(localStorage.getItem(STORE_KEY));
-  if (saved && saved.trade && TRADES[saved.trade]) S = Object.assign(preset(saved.trade), saved);
+  if (saved && saved.trade && TRADES[saved.trade]) S = sanitize(Object.assign(preset(saved.trade), saved));
 }catch(e){}
 
 /* ════════ 道具 ════════ */
@@ -473,6 +504,13 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const nl = s => esc(s).replace(/\n/g,"<br>");
 const accent = () => S.accentColor || S.mainColor;
+/* 2色を自前で混ぜる（古い端末の color-mix 非対応でも崩れないように） */
+function hexMix(a, b, wa){
+  const ch = s => { const v = parseInt(s.slice(1), 16); return [v>>16 & 255, v>>8 & 255, v & 255]; };
+  const [r1,g1,b1] = ch(a), [r2,g2,b2] = ch(b);
+  const m = (x,y) => Math.round(x*wa + y*(1-wa));
+  return "#" + [m(r1,r2), m(g1,g2), m(b1,b2)].map(v => v.toString(16).padStart(2,"0")).join("");
+}
 /* 明るい色の上では黒文字、暗い色の上では白文字 */
 function onColor(hex){
   const n = parseInt(hex.slice(1), 16);
@@ -480,6 +518,17 @@ function onColor(hex){
   return lum > 150 ? "#20242a" : "#ffffff";
 }
 const cleanSlug = () => (S.slug.toLowerCase().replace(/[^a-z0-9-]/g,"-").replace(/-+/g,"-").replace(/^-|-$/g,"") || "mysite");
+function copyText(s){
+  return navigator.clipboard.writeText(s).catch(() => new Promise((res, rej) => {
+    const ta = document.createElement("textarea");
+    ta.value = s; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try{ ok = document.execCommand("copy"); }catch(e){}
+    ta.remove();
+    ok ? res() : rej(new Error("copy"));
+  }));
+}
 
 let saveTimer;
 function persist(){
@@ -522,6 +571,7 @@ function build(){
   const name = esc(S.name.trim() || "（名前を入れてください）");
   const tag = esc(S.tag.trim());
   const telHref = S.phone.replace(/[^\d+]/g,"");
+  const hasTel = telHref.length >= 6;
   const badges = Object.keys(BADGES).filter(k => S.badges[k]).map(k => `<span class="bdg">${BADGES[k]}</span>`).join("");
   const P = S.parts;
 
@@ -530,12 +580,12 @@ function build(){
     ${badges ? `<p class="hero-badges">${badges}</p>` : ""}
     <h1>${name}</h1>
     ${tag ? `<p class="tagline">${tag}</p>` : ""}
-    ${S.phone ? `<a class="hero-tel" href="tel:${telHref}">☎ ${esc(S.phone)}</a>` : ""}`;
+    ${hasTel ? `<a class="hero-tel" href="tel:${telHref}">☎ ${esc(S.phone)}</a>` : ""}`;
   let hero;
   if (S.heroStyle === "cover"){
     const bgimg = S.heroImg
       ? `background-image:linear-gradient(180deg, rgba(10,14,18,.25), rgba(10,14,18,.62)), url(${S.heroImg})`
-      : `background-image:linear-gradient(180deg, rgba(10,14,18,.16), rgba(10,14,18,.44)), linear-gradient(150deg, ${S.mainColor}, color-mix(in srgb, ${S.mainColor} 55%, #10151a))`;
+      : `background-image:linear-gradient(180deg, rgba(10,14,18,.16), rgba(10,14,18,.44)), linear-gradient(150deg, ${S.mainColor}, ${hexMix(S.mainColor, "#10151a", .55)})`;
     hero = `<header class="hero cover" style="${bgimg}"><div class="hero-in">${heroInner}</div></header>`;
   } else if (S.heroStyle === "split"){
     hero = `<header class="hero split"><div class="hero-in">${heroInner}</div>
@@ -579,21 +629,22 @@ function build(){
 
   /* 連絡先 */
   const contactRows = [];
-  if (S.phone) contactRows.push(`<a class="c-tel" href="tel:${telHref}">☎ ${esc(S.phone)}</a>
+  if (hasTel) contactRows.push(`<a class="c-tel" href="tel:${telHref}">☎ ${esc(S.phone)}</a>
     <p class="fine">「ホームページを見た」と言っていただけると助かります。</p>`);
+  else if (S.phone.trim()) contactRows.push(`<p class="c-line">電話：<b>${esc(S.phone)}</b></p>`);
   if (S.email) contactRows.push(`<a class="c-btn" href="mailto:${esc(S.email)}">✉ メールで相談する</a>`);
   if (S.line) contactRows.push(`<p class="c-line">LINE：<b>${esc(S.line)}</b> で検索してください</p>`);
   if (contactRows.length)
     secs.push(`<section class="sec contact"><h2>お問い合わせ</h2>${contactRows.join("")}</section>`);
 
   const quals = S.quals.trim() ? `<p class="quals">${esc(S.quals)}</p>` : "";
-  const stickybar = S.phone ? `<div class="callbar">
+  const stickybar = hasTel ? `<div class="callbar">
     <a class="cb-tel" href="tel:${telHref}">☎ 電話する</a>
     ${S.email ? `<a class="cb-mail" href="mailto:${esc(S.email)}" aria-label="メール">✉</a>` : ""}</div>` : "";
 
   const isCard = S.sectionStyle === "card";
-  const soft = dark ? `color-mix(in srgb, ${acc} 16%, ${B.bg})` : `color-mix(in srgb, ${S.mainColor} 7%, ${B.bg})`;
-  const lineC = dark ? "rgba(255,255,255,.14)" : `color-mix(in srgb, ${B.ink} 14%, transparent)`;
+  const soft = dark ? hexMix(acc, B.bg, .16) : hexMix(S.mainColor, B.bg, .07);
+  const lineC = dark ? "rgba(255,255,255,.14)" : hexMix(B.ink, B.bg, .14);
 
   return `<!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
@@ -609,7 +660,7 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0; background:${B.bg}; color:${B.ink};
   font-family:${F.body},"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
   font-size:16px; line-height:1.95; letter-spacing:.02em; -webkit-font-smoothing:antialiased;
-  ${S.phone ? "padding-bottom:74px;" : ""}}
+  ${hasTel ? "padding-bottom:74px;" : ""}}
 h1,h2{font-family:${F.head},"Hiragino Sans",serif; line-height:1.4; letter-spacing:.03em}
 .page{max-width:720px; margin:0 auto}
 main{padding:0 22px}
@@ -753,6 +804,7 @@ function colorGroup(boxId, colors, get, set, withAuto){
   });
   const custom = document.createElement("input");
   custom.type = "color";
+  if (custom.type !== "color"){ refresh(); return; }
   custom.value = (get() && !colors.includes(get())) ? get() : "#888888";
   custom.setAttribute("aria-label", "すきな色をえらぶ");
   custom.addEventListener("input", () => { set(custom.value); refresh(); paint(); });
@@ -876,7 +928,7 @@ function shrink(file, maxW, q){
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
-      const scale = Math.min(1, maxW / img.naturalWidth);
+      const scale = Math.min(1, maxW / img.naturalWidth, 2200 / img.naturalHeight);
       const c = document.createElement("canvas");
       c.width = Math.max(1, Math.round(img.naturalWidth * scale));
       c.height = Math.max(1, Math.round(img.naturalHeight * scale));
@@ -884,7 +936,9 @@ function shrink(file, maxW, q){
       ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
       ctx.drawImage(img, 0, 0, c.width, c.height);
       URL.revokeObjectURL(url);
-      res(c.toDataURL("image/jpeg", q));
+      const out = c.toDataURL("image/jpeg", q);
+      if (out.length < 100) { rej(new Error("encode")); return; }
+      res(out);
     };
     img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("read")); };
     img.src = url;
@@ -929,7 +983,7 @@ function renderWorks(){
 }
 $("workPick").addEventListener("click", () => $("workFile").click());
 $("workFile").addEventListener("change", async e => {
-  const files = [...e.target.files].slice(0, 8 - S.works.length);
+  const files = [...e.target.files].slice(0, Math.max(0, 8 - S.works.length));
   e.target.value = "";
   for (const f of files){
     try{ S.works.push({ img: await shrink(f, 1000, .76), cap:"" }); }
@@ -978,21 +1032,22 @@ function download(){
 }
 $("dl").addEventListener("click", () => { download(); say("filemsg", "ダウンロードしました"); });
 $("cp").addEventListener("click", async () => {
-  try{ await navigator.clipboard.writeText(build()); say("filemsg", "コピーしました"); }
-  catch(e){ say("filemsg", "コピーできませんでした"); }
+  try{ await copyText(build()); say("filemsg", "コピーしました"); }
+  catch(e){ say("filemsg", "コピーできませんでした。「ファイルにして持ち帰る」をお使いください"); }
 });
 
 $("pub").addEventListener("click", () => {
   const file = cleanSlug() + ".html";
-  download();
   window.open(`https://github.com/${REPO}/upload/${BRANCH}`, "_blank", "noopener");
+  download();
   const steps = $("pubsteps");
   steps.className = "steps on";
   steps.innerHTML = `<b>ファイルはもう手元にあります。ひらいた GitHub の画面で：</b><ol>
     <li>「choose your files」を押す</li>
     <li>いまダウンロードされた <b>${esc(file)}</b> をえらぶ（「ダウンロード」の中にあります）</li>
     <li>下までスクロールして、緑の「Commit changes」を押す</li>
-    <li>1〜2分後に、上のアドレスをひらく</li></ol>`;
+    <li>1〜2分後に、上のアドレスをひらく</li></ol>
+  <p style="margin:8px 0 0">ファイルが画面にひらいてしまったときは、共有ボタンから「&quot;ファイル&quot;に保存」で保存してから、えらんでください。</p>`;
   say("pubmsg", "ファイルを用意して、GitHub をひらきました");
 });
 
@@ -1000,16 +1055,16 @@ $("pub").addEventListener("click", () => {
 $("exportBtn").addEventListener("click", async () => {
   const lite = Object.assign({}, S, { heroImg:null, works:[] });
   const code = btoa(unescape(encodeURIComponent(JSON.stringify(lite))));
-  try{ await navigator.clipboard.writeText(code); say("savemsg", "保存コードをコピーしました"); }
+  try{ await copyText(code); say("savemsg", "保存コードをコピーしました"); }
   catch(e){ prompt("この文字列を控えてください", code); }
 });
 $("importBtn").addEventListener("click", () => {
   const code = prompt("保存コードを貼り付けてください");
   if (!code) return;
   try{
-    const data = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+    const data = JSON.parse(decodeURIComponent(escape(atob(code.replace(/\s+/g, "")))));
     if (!data.trade || !TRADES[data.trade]) throw new Error("bad");
-    S = Object.assign(preset(data.trade), data);
+    S = sanitize(Object.assign(preset(data.trade), data));
     syncInputs(); buildPickers(); showUrl(); paint();
     say("savemsg", "読み込みました");
   }catch(e){ say("savemsg", "そのコードは読み込めませんでした"); }
