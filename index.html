@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>おうちの応急処置</title>
+<meta name="description" content="水漏れ・停電・ガスのにおい。困ったときに、まず何をすればいいかを短くまとめたページです。">
+<meta name="theme-color" content="#a8471f">
+<style>
+:root{
+  --bg:#f7f5f1; --card:#ffffff; --ink:#1d1a16; --muted:#6d6660;
+  --line:#e3ddd4; --accent:#a8471f; --accent-soft:#fbeee8;
+  --danger:#b3261e; --danger-soft:#fdecea; --ok:#2c6e4b; --ok-soft:#e9f4ee;
+  --radius:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#16140f; --card:#211e18; --ink:#f0ece5; --muted:#a49c92;
+    --line:#332e26; --accent:#e58a5e; --accent-soft:#33231b;
+    --danger:#f28b82; --danger-soft:#3a1f1c; --ok:#7fc79b; --ok-soft:#1b2f24;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;
+  font-size:17px; line-height:1.75; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:680px; margin:0 auto; padding:0 18px 64px}
+
+header{padding:32px 0 20px}
+h1{font-size:1.7rem; line-height:1.35; margin:0 0 8px; letter-spacing:.01em}
+.lede{margin:0; color:var(--muted); font-size:.95rem}
+
+/* 緊急バー */
+.sos{
+  margin:20px 0 0; padding:14px 16px; border-radius:var(--radius);
+  background:var(--danger-soft); border:1px solid color-mix(in srgb,var(--danger) 30%,transparent);
+}
+.sos b{color:var(--danger)}
+.sos p{margin:6px 0 0; font-size:.9rem; color:var(--muted)}
+
+/* 検索 */
+.search{position:relative; margin:24px 0 12px}
+.search input{
+  width:100%; padding:14px 16px; font-size:1rem; font-family:inherit;
+  color:var(--ink); background:var(--card);
+  border:1px solid var(--line); border-radius:var(--radius);
+}
+.search input:focus{outline:2px solid var(--accent); outline-offset:1px}
+
+/* カテゴリ */
+.cats{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 22px}
+.cats button{
+  font-family:inherit; font-size:.9rem; padding:8px 15px; cursor:pointer;
+  color:var(--ink); background:var(--card);
+  border:1px solid var(--line); border-radius:999px;
+}
+.cats button[aria-pressed="true"]{
+  background:var(--accent); border-color:var(--accent); color:#fff;
+}
+
+/* カード */
+.card{
+  background:var(--card); border:1px solid var(--line);
+  border-radius:var(--radius); margin-bottom:10px; overflow:hidden;
+}
+.card>summary{
+  list-style:none; cursor:pointer; padding:16px 18px;
+  display:flex; align-items:center; gap:10px; font-weight:600;
+}
+.card>summary::-webkit-details-marker{display:none}
+.card>summary::after{
+  content:"＋"; margin-left:auto; color:var(--muted); font-weight:400; flex:none;
+}
+.card[open]>summary::after{content:"−"}
+.card[open]>summary{border-bottom:1px solid var(--line)}
+.tag{
+  flex:none; font-size:.7rem; font-weight:700; letter-spacing:.04em;
+  padding:3px 8px; border-radius:999px;
+  background:var(--danger); color:#fff;
+}
+.body{padding:4px 18px 18px}
+.step{margin:16px 0 0}
+.step h3{
+  margin:0 0 6px; font-size:.82rem; font-weight:700; letter-spacing:.06em;
+  display:flex; align-items:center; gap:7px;
+}
+.step h3::before{content:""; width:9px; height:9px; border-radius:50%; flex:none}
+.step.do    h3{color:var(--ok)}      .step.do    h3::before{background:var(--ok)}
+.step.dont  h3{color:var(--danger)}  .step.dont  h3::before{background:var(--danger)}
+.step.call  h3{color:var(--accent)}  .step.call  h3::before{background:var(--accent)}
+.step ul{margin:0; padding-left:1.3em}
+.step li{margin:4px 0}
+.step li::marker{color:var(--muted)}
+
+.empty{color:var(--muted); text-align:center; padding:40px 0}
+
+/* 連絡先メモ */
+.memo{
+  margin:36px 0 0; padding:20px 18px;
+  background:var(--accent-soft); border:1px solid var(--line); border-radius:var(--radius);
+}
+.memo h2{margin:0 0 4px; font-size:1.05rem}
+.memo p{margin:0 0 16px; font-size:.85rem; color:var(--muted)}
+.memo label{display:block; margin-bottom:12px; font-size:.85rem; color:var(--muted)}
+.memo input{
+  display:block; width:100%; margin-top:4px; padding:11px 13px;
+  font-size:1rem; font-family:inherit; color:var(--ink);
+  background:var(--card); border:1px solid var(--line); border-radius:10px;
+}
+.memo input:focus{outline:2px solid var(--accent); outline-offset:1px}
+.saved{font-size:.8rem; color:var(--ok); min-height:1.4em; margin:0}
+
+footer{margin-top:36px; padding-top:20px; border-top:1px solid var(--line);
+  font-size:.82rem; color:var(--muted)}
+footer p{margin:0 0 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>おうちの応急処置</h1>
+  <p class="lede">水漏れ、ブレーカー、ガスのにおい。<br>あわてる前に、まずこれだけ。</p>
+</header>
+
+<div class="sos">
+  <b>火が出ている・けむりが出ている・ガスのにおいが強いときは、何もせず外へ。</b>
+  <p>火事 119 ／ ガス漏れは外に出てからガス会社へ</p>
+</div>
+
+<div class="search">
+  <input id="q" type="search" placeholder="困っていることを入れる（例：水、ドア、におい）" aria-label="困っていることで探す">
+</div>
+
+<nav class="cats" id="cats" aria-label="種類でしぼる"></nav>
+
+<main id="list"></main>
+<p class="empty" id="empty" hidden>その言葉では見つかりませんでした。<br>別の言い方で探してみてください。</p>
+
+<section class="memo">
+  <h2>いざという時の連絡先</h2>
+  <p>ここに入れておくと、この端末に残ります。困った時に探さなくて済みます。</p>
+  <label>管理会社・大家さん<input id="c1" type="tel" placeholder="電話番号"></label>
+  <label>水道の業者<input id="c2" type="tel" placeholder="電話番号"></label>
+  <label>電気の業者<input id="c3" type="tel" placeholder="電話番号"></label>
+  <label>ガス会社<input id="c4" type="tel" placeholder="電話番号"></label>
+  <p class="saved" id="saved" role="status"></p>
+</section>
+
+<footer>
+  <p>書いてあるのは、業者が来るまでの間にできることの目安です。<br>
+  少しでも危ないと感じたら、無理をせず専門の業者を呼んでください。</p>
+  <p>賃貸にお住まいの場合は、自分で直す前に管理会社へ一報を。<br>
+  あとの費用の話が変わることがあります。</p>
+</footer>
+
+</div>
+
+<script>
+const ITEMS = [
+  {
+    cat:"水まわり", urgent:false,
+    title:"蛇口から水が止まらない",
+    words:"じゃぐち 水漏れ ぽたぽた カラン 洗面 台所",
+    do:["流し台や洗面台の下にある「止水栓」を、マイナスドライバーか手で右に回して閉める。","見つからなければ、家の外の水道メーターの箱にある元栓を閉める。","閉めるとき、何回まわしたか覚えておく。戻すときに同じだけ戻せます。"],
+    dont:["ハンドルを力任せに締め続けない。中のゴムがつぶれて、もっと漏れます。"],
+    call:["止水栓を閉めても漏れが止まらない。","蛇口の根元や、台の下の床が濡れている。"]
+  },
+  {
+    cat:"水まわり", urgent:false,
+    title:"トイレが流れない・あふれそう",
+    words:"トイレ つまり 詰まり 便器 あふれる 流れない ラバーカップ",
+    do:["まずレバーを回すのをやめる。もう一度流すと、あふれます。","便器の横か後ろの壁にある止水栓を閉める。","ラバーカップ（すっぽん）を排水口にぴったり当て、ゆっくり押して、勢いよく引く。引くときに取れます。"],
+    dont:["熱いお湯を入れない。便器が割れることがあります。ぬるま湯まで。","おもちゃやスマホなど固いものを落とした時は、流そうとしない。奥で完全に詰まります。"],
+    call:["30分ためしても水が引かない。","便器の外に水が出てきた。"]
+  },
+  {
+    cat:"水まわり", urgent:false,
+    title:"台所・洗面の水が流れていかない",
+    words:"排水 つまり 詰まり シンク 洗面 流れない におい ぬめり",
+    do:["排水口のフタとゴミ受けを外して、たまった物を取る。","重曹をふりかけ、その上からお酢かクエン酸をかけて30分おき、ぬるま湯で流す。","それでも駄目なら、水を少しためてラバーカップ。"],
+    dont:["熱湯を一気に流さない。排水管が変形することがあります。","市販の薬剤を何種類も混ぜない。危ないガスが出ます。"],
+    call:["家じゅうの排水が同時に流れにくい。（下水側の詰まりかもしれません）"]
+  },
+  {
+    cat:"水まわり", urgent:true,
+    title:"天井から水が落ちてくる",
+    words:"天井 漏水 雨漏り 上の階 しみ 水 落ちる",
+    do:["下にバケツと新聞紙。まわりの家電のコンセントを抜く。","濡れている場所のブレーカーを落とす。","写真を撮っておく。あとの話し合いで必ず要ります。","集合住宅なら、上の階か管理会社にすぐ連絡。"],
+    dont:["濡れた照明やコンセントに触らない。感電します。","天井のふくらみを自分で突かない。一気に落ちてきます。"],
+    call:["すぐに呼んでください。放っておくと、下の階まで広がります。"]
+  },
+  {
+    cat:"電気", urgent:false,
+    title:"ブレーカーが落ちた",
+    words:"ブレーカー 停電 電気 消えた 落ちる 分電盤",
+    do:["分電盤を開け、まず右側の小さいスイッチを全部オフにする。","次に一番大きい主幹スイッチをオン。","小さいスイッチを一つずつオンにしていく。落ちた瞬間の一つが原因の部屋です。","その部屋で使っていた家電を減らす。特に電子レンジ・ドライヤー・電気ポットの同時使用。"],
+    dont:["濡れた手で触らない。","落ちたブレーカーを、原因を確かめずに何度も上げ直さない。"],
+    call:["同じ回路だけが、何もしていないのに何度も落ちる。（漏電の可能性があります）"]
+  },
+  {
+    cat:"電気", urgent:true,
+    title:"コンセントが熱い・焦げくさい",
+    words:"コンセント 焦げ こげ におい 熱い 火花 タコ足",
+    do:["その部屋のブレーカーを落とす。","冷めてからプラグを抜く。","そのコンセントは、直るまで使わない。"],
+    dont:["水をかけない。","そのまま使い続けない。火事のもとです。"],
+    call:["すぐに呼んでください。焦げ跡があるなら、コンセント自体の交換が要ります。"]
+  },
+  {
+    cat:"建具", urgent:false,
+    title:"ドアが閉まらない・きしむ",
+    words:"ドア 扉 閉まらない きしむ 音 蝶番 ちょうつがい",
+    do:["蝶番（ちょうつがい）のネジを、プラスドライバーで締め直す。ゆるんでいるだけのことが多いです。","きしむ音には、シリコン系の潤滑スプレーを蝶番の軸に少しだけ。"],
+    dont:["油の多いスプレーをレールや床側に使わない。ホコリを吸って、あとでもっと動かなくなります。","反りが出ているドアを、無理に押し込んで閉めない。枠まで傷みます。"],
+    call:["ネジを締めても直らない。枠ごとゆがんでいる可能性があります。"]
+  },
+  {
+    cat:"建具", urgent:false,
+    title:"引き戸・網戸が重い、外れる",
+    words:"引き戸 網戸 サッシ 重い 外れる レール 戸車",
+    do:["レールの溝を、掃除機と歯ブラシで掃除する。これだけで直ることがよくあります。","戸の下側にある戸車の調整ネジを、少しずつ回して高さを合わせる。","網戸は、上に持ち上げてから手前に引くと外れます。"],
+    dont:["外れたまま無理に力をかけない。レールがつぶれます。"],
+    call:["レールがへこんでいる、サッシが動かない。"]
+  },
+  {
+    cat:"壁・床", urgent:false,
+    title:"壁に穴があいた・傷がついた",
+    words:"壁 穴 きず 傷 クロス 剥がれ めくれ 石膏ボード",
+    do:["画びょう程度の穴なら、そのままで大丈夫です。","500円玉くらいまでなら、ホームセンターの補修用パテで埋めて、乾かして平らにする。","クロスのめくれは、専用のジョイントコークかクロス用のりで押さえる。"],
+    dont:["賃貸で、自分で大きく直そうとしない。かえって費用が上がることがあります。"],
+    call:["こぶし以上の穴。裏の板ごと直す作業になります。"]
+  },
+  {
+    cat:"壁・床", urgent:false,
+    title:"床がきしむ・ぶかぶかする",
+    words:"床 きしむ 音 ぶかぶか 浮く たわむ フローリング",
+    do:["きしむ場所と範囲を覚えておく。歩くたびに鳴るのか、一箇所だけかで原因が変わります。","水まわりの近くなら、その下で水が漏れていないか見る。"],
+    dont:["ぶかぶかする場所を、重い物を置いてごまかさない。"],
+    call:["踏むと沈む、ぶかぶかする。下の板が傷んでいる可能性が高いです。"]
+  },
+  {
+    cat:"におい・カビ", urgent:false,
+    title:"窓や壁にカビが出た",
+    words:"カビ かび 結露 黒い 窓 押入れ 湿気 におい",
+    do:["消毒用エタノールを吹いて、乾いた布で拭き取る。","そのあと換気。1日5分でも、窓を2ヶ所開けて空気を通す。","家具は壁から5センチ離して置く。裏に空気が通ります。"],
+    dont:["塩素系の漂白剤と、酸性の洗剤を一緒に使わない。有毒なガスが出ます。","カビをかわいた状態でこすらない。胞子が舞います。"],
+    call:["壁の内側から広がっている、拭いてもすぐ戻る。"]
+  },
+  {
+    cat:"におい・カビ", urgent:false,
+    title:"排水口から下水のにおい",
+    words:"におい 臭い 下水 排水 洗濯機 風呂 封水",
+    do:["しばらく使っていない排水口に、コップ一杯の水を流す。乾いて、においを止めるフタ（水）が切れているだけのことが多いです。","洗濯機の排水ホースの根元も同じ。専用の部品で塞ぐと止まります。"],
+    dont:["消臭剤で上から隠さない。原因が残ります。"],
+    call:["水を流してもにおう。配管の外れや割れかもしれません。"]
+  },
+  {
+    cat:"緊急", urgent:true,
+    title:"ガスのにおいがする",
+    words:"ガス におい 臭い 漏れ プロパン 都市ガス",
+    do:["火を一切つけない。","窓とドアを大きく開ける。","ガスの元栓とメーターのコックを閉める。","外に出てから、ガス会社に電話する。"],
+    dont:["換気扇や電気のスイッチに触らない。入れるのも切るのも駄目です。火花が出ます。","家の中で電話をかけない。"],
+    call:["すぐにガス会社へ。番号は下の連絡先メモに入れておいてください。"]
+  },
+  {
+    cat:"緊急", urgent:true,
+    title:"地震のあと、家を確認する",
+    words:"地震 揺れ あと 確認 点検 チェック",
+    do:["ガスのにおいがしないか。したら上の項目へ。","水が漏れていないか。台所・洗面・トイレ・給湯器のまわり。","ブレーカーを入れる前に、家電のプラグを一度抜く。倒れた家電が原因で火が出ることがあります。","壁や柱に、新しいひび割れが入っていないか写真を撮る。"],
+    dont:["傾いた家具を一人で起こさない。","ひび割れた壁に体重をかけない。"],
+    call:["柱や梁にひびがある、ドアや窓が開かなくなった。建物のゆがみかもしれません。"]
+  }
+];
+
+const list = document.getElementById("list");
+const empty = document.getElementById("empty");
+const cats = document.getElementById("cats");
+const q = document.getElementById("q");
+let active = "すべて";
+
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const block = (cls, label, arr) =>
+  `<div class="step ${cls}"><h3>${label}</h3><ul>${arr.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`;
+
+function render(){
+  const term = q.value.trim().toLowerCase();
+  const hits = ITEMS.filter(it =>
+    (active === "すべて" || it.cat === active) &&
+    (!term || (it.title + it.words + it.cat).toLowerCase().includes(term))
+  );
+  list.innerHTML = hits.map(it => `
+    <details class="card">
+      <summary>${it.urgent ? '<span class="tag">すぐ連絡</span>' : ""}<span>${esc(it.title)}</span></summary>
+      <div class="body">
+        ${block("do","まず、これをする", it.do)}
+        ${block("dont","やってはいけない", it.dont)}
+        ${block("call","業者を呼ぶ目安", it.call)}
+      </div>
+    </details>`).join("");
+  empty.hidden = hits.length > 0;
+}
+
+["すべて", ...new Set(ITEMS.map(i => i.cat))].forEach(c => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = c;
+  b.setAttribute("aria-pressed", String(c === active));
+  b.addEventListener("click", () => {
+    active = c;
+    [...cats.children].forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    render();
+  });
+  cats.appendChild(b);
+});
+
+q.addEventListener("input", render);
+render();
+
+// 連絡先メモ（この端末の中だけに残ります）
+const saved = document.getElementById("saved");
+let timer;
+["c1","c2","c3","c4"].forEach(id => {
+  const el = document.getElementById(id);
+  try { el.value = localStorage.getItem("nobobb." + id) || ""; } catch (e) {}
+  el.addEventListener("input", () => {
+    try {
+      localStorage.setItem("nobobb." + id, el.value);
+      saved.textContent = "保存しました";
+      clearTimeout(timer);
+      timer = setTimeout(() => { saved.textContent = ""; }, 2000);
+    } catch (e) {
+      saved.textContent = "この端末では保存できません";
+    }
+  });
+});
+</script>
+</body>
+</html>
