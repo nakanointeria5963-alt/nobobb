@@ -1,6 +1,5 @@
-# main に変更が入るたび、その中身を丸ごと gh-pages ブランチに写します。
-# GitHub Pages は gh-pages ブランチを見て公開しているので、
-# これだけで、書いたものがそのままホームページに反映されます。
+# main に変更が入るたび、自動でホームページとして公開します。
+# GitHub の設定画面で何か操作する必要はありません。
 name: ページを公開する
 
 on:
@@ -9,7 +8,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
@@ -18,7 +19,14 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: gh-pages に写す
-        run: git push origin HEAD:refs/heads/gh-pages --force
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
