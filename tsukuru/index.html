@@ -394,15 +394,18 @@ footer.credit a{color:var(--pink)}
 
   <div class="step" id="shareStep">
     <h2><span class="em">📨</span>人に見せる</h2>
-    <p class="hint" style="margin-bottom:0">保存したファイルを、LINE やメールに <b>そのまま貼って送る</b>だけです。
-      受け取った人は、押せばそのまま見られます。アドレスも登録もいりません。</p>
+    <p class="hint" style="margin-bottom:0">
+      <b>メールなら</b>、保存したファイルをそのまま添付して送れます。受け取った人は押すだけで見られます。<br>
+      <b>LINE は、この種類のファイルを受け付けません</b>（「送信できませんでした」と出ます）。
+      LINE で見せたいときは、下の「インターネットのアドレスにしたい」でアドレスを作って、
+      <b>そのアドレスを送って</b>ください。アドレスなら必ず送れます。</p>
   </div>
 
   <details class="fold" id="ghFold">
     <summary><span class="em">🌐</span>インターネットのアドレスにしたい</summary>
     <div class="fold-in">
       <p class="hint">「https://…」のアドレスを作って、誰でも見られるようにする方法です。
-        <b>ここから先は、少し手間がかかります。</b>急ぎでなければ、上のファイルを送るだけで十分です。</p>
+        <b>LINE で人に見せたいときは、こちらが確実です</b>（アドレスなら LINE でも必ず送れます）。</p>
 
       <p class="way"><b>いちばん簡単なのは、詳しい人に頼むこと。</b><br>
         保存したファイルを渡して「これをネットに上げてほしい」と言えば、それで終わりです。
@@ -1241,7 +1244,9 @@ function setupPublish(){
     $("dl").className = "btn ghost";
     $("dl").textContent = "ファイルとしても保存する";
     $("shareStep").querySelector(".hint").innerHTML =
-      "アドレスを送るほかに、保存したファイルを LINE やメールに <b>そのまま貼って送る</b>こともできます。";
+      "「ネットに出す」で出た<b>アドレスを、LINE やメールで送る</b>のがいちばん確実です。" +
+      "メールなら、保存したファイルをそのまま添付して送ることもできます" +
+      "（LINE はこの種類のファイルを受け付けません）。";
   }
 }
 buildPickers();
