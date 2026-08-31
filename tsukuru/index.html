@@ -184,6 +184,13 @@ label.field input:focus, label.field textarea:focus{outline:none; border-color:v
 .done-file{margin:0 0 6px; font-size:.95rem; font-weight:700; word-break:break-all}
 .done-w{margin:0; font-size:.8rem; color:var(--muted)}
 .big-note{margin:16px 0 0; font-size:.85rem; color:var(--muted); line-height:1.8}
+.big .field{text-align:left}
+.liveurl{
+  margin:0 0 14px; padding:12px 13px; font-size:.85rem; font-weight:700;
+  word-break:break-all; line-height:1.6;
+  background:var(--panel); border-radius:12px; color:var(--pink);
+}
+#openUrl{display:block; text-align:center; text-decoration:none; line-height:normal}
 
 .fold{
   background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
@@ -350,23 +357,48 @@ footer.credit a{color:var(--pink)}
 
   <div class="big">
     <p class="big-lede">ホームページが できました</p>
-    <button class="btn big-btn" id="dl" type="button">ホームページを 保存する</button>
-    <div class="done" id="done">
-      <p class="done-t">✓ 保存しました</p>
-      <p class="done-file" id="doneFile"></p>
-      <p class="done-w">スマホの「ファイル」か「ダウンロード」の中に入っています。</p>
+
+    <div id="autoBox" hidden>
+      <label class="field">ページの名前（英数字とハイフン）
+        <input id="slug" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <label class="field">合言葉
+        <input id="pass" type="password" autocomplete="off" placeholder="教わった合言葉"></label>
+      <button class="btn big-btn" id="go" type="button">ネットに出す</button>
+      <p class="msg" id="gomsg" role="status"></p>
+
+      <div class="done" id="live">
+        <p class="done-t">✓ ネットに出ました</p>
+        <p class="liveurl" id="liveUrl"></p>
+        <div class="btns">
+          <button class="btn" id="copyUrl" type="button">アドレスを コピー</button>
+          <a class="btn ghost" id="openUrl" target="_blank" rel="noopener">ひらいて 見てみる</a>
+        </div>
+        <p class="done-w">見られるようになるまで、1〜2分かかります。<br>
+          このアドレスを、名刺やチラシに書けます。</p>
+      </div>
+
+      <p class="big-note">同じ名前でもう一度出すと、新しいものに入れ替わります。</p>
     </div>
-    <p class="big-note">保存されるのは <b>1つのファイル</b>です。<br>
-      これが、ホームページそのものです。</p>
+
+    <div id="manualBox">
+      <button class="btn big-btn" id="dl" type="button">ホームページを 保存する</button>
+      <div class="done" id="done">
+        <p class="done-t">✓ 保存しました</p>
+        <p class="done-file" id="doneFile"></p>
+        <p class="done-w">スマホの「ファイル」か「ダウンロード」の中に入っています。</p>
+      </div>
+      <p class="big-note">保存されるのは <b>1つのファイル</b>です。<br>
+        これが、ホームページそのものです。</p>
+    </div>
   </div>
 
-  <div class="step">
+  <div class="step" id="shareStep">
     <h2><span class="em">📨</span>人に見せる</h2>
     <p class="hint" style="margin-bottom:0">保存したファイルを、LINE やメールに <b>そのまま貼って送る</b>だけです。
       受け取った人は、押せばそのまま見られます。アドレスも登録もいりません。</p>
   </div>
 
-  <details class="fold">
+  <details class="fold" id="ghFold">
     <summary><span class="em">🌐</span>インターネットのアドレスにしたい</summary>
     <div class="fold-in">
       <p class="hint">「https://…」のアドレスを作って、誰でも見られるようにする方法です。
@@ -377,8 +409,6 @@ footer.credit a{color:var(--pink)}
         ホームページの中身は、もう全部このファイルに入っています。</p>
 
       <p class="way2"><b>自分の GitHub を持っている人へ</b></p>
-      <label class="field">ページの名前（英数字とハイフン）
-        <input id="slug" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
       <label class="field">置き場所（あなたのリポジトリ）
         <input id="repo" type="text" placeholder="例：yamada/homepage" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
       <p class="puburl" id="puburl"></p>
@@ -495,6 +525,9 @@ const PARTS = {
   flow:"たのみ方の流れ", voice:"お客さまの声", faq:"よくある質問",
   area:"対応エリア", hours:"営業時間"
 };
+/* 公開の窓口。publish/README.md のとおりに設置して、ここにアドレスを入れる。
+   空のあいだは、ファイルを保存する形のままになる。 */
+let PUBLISH_API = "";
 const BRANCH = "main";
 const STORE_KEY = "nobobb.tsukuru.v2";
 
@@ -513,7 +546,7 @@ function preset(trade){
     font:"gothic", radius:"maru", sectionStyle:"card",
     parts:{ greeting:true, services:true, works:true, flow:true, voice:false, faq:true, area:true, hours:true },
     area:"◯◯市とそのまわり（車で30分ほどの範囲）", hours:"8:00 〜 18:00", holiday:"日曜・祝日",
-    slug:"mysite", repo:""
+    slug:"mysite", repo:"", pass:""
   };
 }
 /* 読み込んだ保存データを、必ずこの形に整えてから使う */
@@ -535,7 +568,7 @@ function sanitize(s){
   s.faq = strArr(s.faq, 2) || d.faq;
   s.voice = (Array.isArray(s.voice) ? s.voice.map(str) : d.voice).slice(0, 2);
   s.flow = (Array.isArray(s.flow) ? s.flow.map(str) : d.flow).slice(0, 8);
-  ["name","tag","greeting","quals","phone","email","line","area","hours","holiday","slug","repo"]
+  ["name","tag","greeting","quals","phone","email","line","area","hours","holiday","slug","repo","pass"]
     .forEach(k => { s[k] = str(s[k]); });
   const bools = (v, keys, def) => { const o = {}; keys.forEach(k =>
     { o[k] = (v && typeof v === "object" && k in v) ? !!v[k] : def[k]; }); return o; };
@@ -894,6 +927,7 @@ function syncInputs(){
   [0,1].forEach(i => { $("f-voice"+i).value = S.voice[i] || ""; });
   $("slug").value = S.slug;
   $("repo").value = S.repo;
+  $("pass").value = S.pass;
   renderSvc(); renderFlow(); renderFaq(); renderHero(); renderWorks();
   renderToggleGroup("badges", BADGES, S.badges);
   renderToggleGroup("parts", PARTS, S.parts, refreshPartPanels);
@@ -1120,6 +1154,48 @@ $("pub").addEventListener("click", () => {
   say("pubmsg", "GitHub をひらきました");
 });
 
+/* ── ネットに出す（窓口ぜんぶ経由） ── */
+const autoOn = () => /^https?:\/\/\S+$/.test(PUBLISH_API);
+$("pass").addEventListener("input", e => { S.pass = e.target.value; persist(); });
+
+async function publish(){
+  const btn = $("go");
+  const slug = cleanSlug();
+  if (!S.pass.trim()){ say("gomsg", "合言葉を入れてください"); return; }
+  btn.disabled = true;
+  const label = btn.textContent;
+  btn.textContent = "出しています…";
+  say("gomsg", "");
+  try{
+    const res = await fetch(PUBLISH_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pass: S.pass, slug, html: build() }),
+    });
+    let data = {};
+    try{ data = await res.json(); }catch(e){}
+    if (!res.ok || !data.url){
+      say("gomsg", data.error || "うまくいきませんでした。少し待ってもう一度おためしください。");
+      return;
+    }
+    $("liveUrl").textContent = data.url;
+    $("openUrl").href = data.url;
+    $("live").className = "done on";
+    say("gomsg", data.updated ? "新しいものに入れ替えました" : "はじめて出しました");
+    $("live").scrollIntoView({ behavior:"smooth", block:"nearest" });
+  }catch(e){
+    say("gomsg", "つながりませんでした。電波を確かめて、もう一度おためしください。");
+  }finally{
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+}
+$("go").addEventListener("click", publish);
+$("copyUrl").addEventListener("click", async () => {
+  try{ await copyText($("liveUrl").textContent); say("gomsg", "アドレスをコピーしました"); }
+  catch(e){ say("gomsg", "コピーできませんでした。長押しで選んでコピーしてください"); }
+});
+
 /* ════════ とっておく ════════ */
 $("exportBtn").addEventListener("click", async () => {
   const lite = Object.assign({}, S, { heroImg:null, works:[] });
@@ -1156,8 +1232,21 @@ function buildPickers(){
   colorGroup("mainColors", MAIN_COLORS, () => S.mainColor, v => S.mainColor = v, false);
   colorGroup("accentColors", ACCENT_COLORS, () => S.accentColor, v => S.accentColor = v, true);
 }
+function setupPublish(){
+  const on = autoOn();
+  $("autoBox").hidden = !on;
+  $("manualBox").hidden = false;          // 保存はいつでも残す
+  $("ghFold").hidden = on;
+  if (on){
+    $("dl").className = "btn ghost";
+    $("dl").textContent = "ファイルとしても保存する";
+    $("shareStep").querySelector(".hint").innerHTML =
+      "アドレスを送るほかに、保存したファイルを LINE やメールに <b>そのまま貼って送る</b>こともできます。";
+  }
+}
 buildPickers();
 syncInputs();
+setupPublish();
 showUrl();
 paint(true);
 </script>
