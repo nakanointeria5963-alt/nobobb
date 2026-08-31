@@ -151,6 +151,7 @@ label.field input:focus, label.field textarea:focus{outline:none; border-color:v
   background:var(--pink); color:#fff; transition:transform .12s; width:100%;
 }
 .btn.ghost{background:var(--panel); color:var(--pink)}
+.btn.line{background:#16a34a; border-color:#16a34a}
 .btn:active{transform:scale(.97)}
 .btns{display:grid; gap:9px}
 .msg{margin:10px 0 0; min-height:1.4em; font-size:.82rem; color:var(--pink); font-weight:700}
@@ -370,7 +371,9 @@ footer.credit a{color:var(--pink)}
         <p class="done-t">✓ ネットに出ました</p>
         <p class="liveurl" id="liveUrl"></p>
         <div class="btns">
-          <button class="btn" id="copyUrl" type="button">アドレスを コピー</button>
+          <button class="btn line" id="lineShare" type="button">LINE で送る</button>
+          <button class="btn ghost" id="copyUrl" type="button">アドレスを コピー</button>
+          <button class="btn ghost" id="otherShare" type="button">ほかのアプリで送る</button>
           <a class="btn ghost" id="openUrl" target="_blank" rel="noopener">ひらいて 見てみる</a>
         </div>
         <p class="done-w">見られるようになるまで、1〜2分かかります。<br>
@@ -418,6 +421,8 @@ footer.credit a{color:var(--pink)}
       <button class="btn ghost" id="pub" type="button">GitHub の置き場所をひらく</button>
       <div class="steps" id="pubsteps"></div>
       <p class="msg" id="pubmsg" role="status"></p>
+      <button class="btn line" id="lineShare2" type="button" style="margin-top:12px">できたアドレスを LINE で送る</button>
+      <p class="note">緑のボタンを押して1〜2分たってから、送ってください。</p>
     </div>
   </details>
 
@@ -1194,6 +1199,18 @@ async function publish(){
   }
 }
 $("go").addEventListener("click", publish);
+function lineShare(url){
+  const name = S.name.trim();
+  const msg = (name ? name + "のホームページができました。\n" : "ホームページができました。\n") + url;
+  window.open("https://line.me/R/share?text=" + encodeURIComponent(msg), "_blank", "noopener");
+}
+$("lineShare").addEventListener("click", () => lineShare($("liveUrl").textContent));
+$("lineShare2").addEventListener("click", () => lineShare($("puburl").textContent));
+$("otherShare").addEventListener("click", () => {
+  const url = $("liveUrl").textContent;
+  if (navigator.share) navigator.share({ text: S.name.trim() + "のホームページ", url }).catch(() => {});
+});
+if (!navigator.share) $("otherShare").hidden = true;
 $("copyUrl").addEventListener("click", async () => {
   try{ await copyText($("liveUrl").textContent); say("gomsg", "アドレスをコピーしました"); }
   catch(e){ say("gomsg", "コピーできませんでした。長押しで選んでコピーしてください"); }
@@ -1244,9 +1261,9 @@ function setupPublish(){
     $("dl").className = "btn ghost";
     $("dl").textContent = "ファイルとしても保存する";
     $("shareStep").querySelector(".hint").innerHTML =
-      "「ネットに出す」で出た<b>アドレスを、LINE やメールで送る</b>のがいちばん確実です。" +
-      "メールなら、保存したファイルをそのまま添付して送ることもできます" +
-      "（LINE はこの種類のファイルを受け付けません）。";
+      "「ネットに出す」のあとに出る<b>「LINE で送る」</b>を押すと、" +
+      "アドレスの入った LINE がひらきます。あとは<b>相手をえらんで送信を押すだけ</b>です。" +
+      "メールなら、保存したファイルをそのまま添付して送ることもできます。";
   }
 }
 buildPickers();
