@@ -171,6 +171,36 @@ label.field input:focus, label.field textarea:focus{outline:none; border-color:v
 .note{margin:10px 0 0; font-size:.75rem; color:var(--muted)}
 .danger{border-color:var(--line); color:var(--muted); background:var(--panel)}
 
+/* 公開タブ */
+.big{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  padding:26px 18px 22px; margin-bottom:14px; box-shadow:var(--shadow); text-align:center;
+}
+.big-lede{margin:0 0 18px; font-size:1.15rem; font-weight:700}
+.big-btn{font-size:1.1rem; padding:20px}
+.done{display:none; margin-top:16px; padding:15px 14px; border-radius:15px; background:var(--pink-soft)}
+.done.on{display:block}
+.done-t{margin:0 0 4px; font-weight:700; color:var(--pink)}
+.done-file{margin:0 0 6px; font-size:.95rem; font-weight:700; word-break:break-all}
+.done-w{margin:0; font-size:.8rem; color:var(--muted)}
+.big-note{margin:16px 0 0; font-size:.85rem; color:var(--muted); line-height:1.8}
+
+.fold{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  margin-bottom:14px; box-shadow:var(--shadow); overflow:hidden;
+}
+.fold > summary{
+  list-style:none; cursor:pointer; padding:17px 18px; font-size:.95rem; font-weight:700;
+  display:flex; align-items:center; gap:9px;
+}
+.fold > summary::-webkit-details-marker{display:none}
+.fold > summary::after{content:"＋"; margin-left:auto; color:var(--muted); font-weight:400}
+.fold[open] > summary::after{content:"−"}
+.fold[open] > summary{border-bottom:1px solid var(--line)}
+.fold-in{padding:16px 16px 18px}
+.way{margin:0 0 18px; padding:14px 15px; background:var(--bg); border-radius:14px; font-size:.86rem}
+.way2{margin:0 0 12px; font-size:.86rem}
+
 footer.credit{margin-top:22px; font-size:.78rem; color:var(--muted); text-align:center}
 footer.credit a{color:var(--pink)}
 
@@ -317,38 +347,63 @@ footer.credit a{color:var(--pink)}
 
 <!-- ─────── 公開 ─────── -->
 <section class="panel" data-tab="open">
-  <div class="step">
-    <h2><span class="em">🌐</span>ネットに出す</h2>
-    <p class="hint">ページの名前を決めて、ボタンを押すだけです。</p>
-    <label class="field">ページの名前（英数字とハイフン）
-      <input id="slug" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
-    <p class="puburl" id="puburl"></p>
-    <button class="btn" id="pub" type="button">GitHub に出す</button>
-    <div class="steps" id="pubsteps"></div>
-    <p class="msg" id="pubmsg" role="status"></p>
-    <p class="note">作り直したくなったら、直してから同じ名前でもう一度出せば、新しいものに置き替わります。</p>
-  </div>
-  <div class="step">
-    <h2><span class="em">📦</span>ファイルとして持つ</h2>
-    <div class="btns" style="margin-top:10px">
-      <button class="btn ghost" id="dl" type="button">ファイルにして持ち帰る</button>
-      <button class="btn ghost" id="cp" type="button">中身をコピーする</button>
+
+  <div class="big">
+    <p class="big-lede">ホームページが できました</p>
+    <button class="btn big-btn" id="dl" type="button">ホームページを 保存する</button>
+    <div class="done" id="done">
+      <p class="done-t">✓ 保存しました</p>
+      <p class="done-file" id="doneFile"></p>
+      <p class="done-w">スマホの「ファイル」か「ダウンロード」の中に入っています。</p>
     </div>
-    <p class="msg" id="filemsg" role="status"></p>
+    <p class="big-note">保存されるのは <b>1つのファイル</b>です。<br>
+      これが、ホームページそのものです。</p>
   </div>
+
   <div class="step">
-    <h2><span class="em">💾</span>とっておく・やり直す</h2>
-    <p class="hint">書いたものは、この端末に自動で残ります。ページを閉じても、次にひらくと続きからです。</p>
-    <div class="btns">
-      <button class="btn ghost" id="exportBtn" type="button">保存コードをコピー（別の端末に移すとき）</button>
-      <button class="btn ghost" id="importBtn" type="button">保存コードを貼って読み込む</button>
-      <button class="btn ghost danger" id="resetBtn" type="button">ぜんぶ消して、はじめから</button>
-    </div>
-    <p class="msg" id="savemsg" role="status"></p>
-    <p class="note">保存コードに写真は入りません（大きすぎるため）。写真だけ入れ直してください。</p>
+    <h2><span class="em">📨</span>人に見せる</h2>
+    <p class="hint" style="margin-bottom:0">保存したファイルを、LINE やメールに <b>そのまま貼って送る</b>だけです。
+      受け取った人は、押せばそのまま見られます。アドレスも登録もいりません。</p>
   </div>
+
+  <details class="fold">
+    <summary><span class="em">🌐</span>インターネットのアドレスにしたい</summary>
+    <div class="fold-in">
+      <p class="hint">「https://…」のアドレスを作って、誰でも見られるようにする方法です。
+        <b>ここから先は、少し手間がかかります。</b>急ぎでなければ、上のファイルを送るだけで十分です。</p>
+
+      <p class="way"><b>いちばん簡単なのは、詳しい人に頼むこと。</b><br>
+        保存したファイルを渡して「これをネットに上げてほしい」と言えば、それで終わりです。
+        ホームページの中身は、もう全部このファイルに入っています。</p>
+
+      <p class="way2"><b>自分の GitHub を持っている人へ</b></p>
+      <label class="field">ページの名前（英数字とハイフン）
+        <input id="slug" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <label class="field">置き場所（あなたのリポジトリ）
+        <input id="repo" type="text" placeholder="例：yamada/homepage" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <p class="puburl" id="puburl"></p>
+      <button class="btn ghost" id="pub" type="button">GitHub の置き場所をひらく</button>
+      <div class="steps" id="pubsteps"></div>
+      <p class="msg" id="pubmsg" role="status"></p>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary><span class="em">💾</span>とっておく・やり直す</summary>
+    <div class="fold-in">
+      <p class="hint">書いたものは、この端末に自動で残ります。閉じても、次にひらくと続きからです。</p>
+      <div class="btns">
+        <button class="btn ghost" id="exportBtn" type="button">保存コードをコピー（別の端末に移すとき）</button>
+        <button class="btn ghost" id="importBtn" type="button">保存コードを貼って読み込む</button>
+        <button class="btn ghost danger" id="resetBtn" type="button">ぜんぶ消して、はじめから</button>
+      </div>
+      <p class="msg" id="savemsg" role="status"></p>
+      <p class="note">保存コードに写真は入りません（大きすぎるため）。写真だけ入れ直してください。</p>
+    </div>
+  </details>
+
   <footer class="credit">
-    <p>つくったものは、出すまで この端末の中だけにあります。</p>
+    <p>つくったものは、保存するまで この端末の中だけにあります。</p>
     <p><a href="../">← おうちの応急処置</a></p>
   </footer>
 </section>
@@ -440,7 +495,6 @@ const PARTS = {
   flow:"たのみ方の流れ", voice:"お客さまの声", faq:"よくある質問",
   area:"対応エリア", hours:"営業時間"
 };
-const REPO = "nakanointeria5963-alt/nobobb";
 const BRANCH = "main";
 const STORE_KEY = "nobobb.tsukuru.v2";
 
@@ -459,7 +513,7 @@ function preset(trade){
     font:"gothic", radius:"maru", sectionStyle:"card",
     parts:{ greeting:true, services:true, works:true, flow:true, voice:false, faq:true, area:true, hours:true },
     area:"◯◯市とそのまわり（車で30分ほどの範囲）", hours:"8:00 〜 18:00", holiday:"日曜・祝日",
-    slug:"mysite"
+    slug:"mysite", repo:""
   };
 }
 /* 読み込んだ保存データを、必ずこの形に整えてから使う */
@@ -481,7 +535,7 @@ function sanitize(s){
   s.faq = strArr(s.faq, 2) || d.faq;
   s.voice = (Array.isArray(s.voice) ? s.voice.map(str) : d.voice).slice(0, 2);
   s.flow = (Array.isArray(s.flow) ? s.flow.map(str) : d.flow).slice(0, 8);
-  ["name","tag","greeting","quals","phone","email","line","area","hours","holiday","slug"]
+  ["name","tag","greeting","quals","phone","email","line","area","hours","holiday","slug","repo"]
     .forEach(k => { s[k] = str(s[k]); });
   const bools = (v, keys, def) => { const o = {}; keys.forEach(k =>
     { o[k] = (v && typeof v === "object" && k in v) ? !!v[k] : def[k]; }); return o; };
@@ -839,6 +893,7 @@ function syncInputs(){
   FIELDS.forEach(([id,key]) => { $(id).value = S[key]; });
   [0,1].forEach(i => { $("f-voice"+i).value = S.voice[i] || ""; });
   $("slug").value = S.slug;
+  $("repo").value = S.repo;
   renderSvc(); renderFlow(); renderFaq(); renderHero(); renderWorks();
   renderToggleGroup("badges", BADGES, S.badges);
   renderToggleGroup("parts", PARTS, S.parts, refreshPartPanels);
@@ -1016,39 +1071,53 @@ function say(id, s){
   clearTimeout(el._t);
   el._t = setTimeout(() => { el.textContent = ""; }, 3200);
 }
+const cleanRepo = () => S.repo.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\.git$/, "").replace(/\/+$/, "");
+const repoOk = () => /^[\w.-]+\/[\w.-]+$/.test(cleanRepo());
 function showUrl(){
-  const [owner, repo] = REPO.split("/");
+  if (!repoOk()){
+    $("puburl").textContent = "置き場所を入れると、ここにアドレスが出ます";
+    return;
+  }
+  const [owner, repo] = cleanRepo().split("/");
   $("puburl").textContent = `https://${owner}.github.io/${repo}/${cleanSlug()}.html`;
 }
 $("slug").addEventListener("input", e => { S.slug = e.target.value; showUrl(); persist(); });
+$("repo").addEventListener("input", e => { S.repo = e.target.value; showUrl(); persist(); });
 
 function download(){
+  const file = cleanSlug() + ".html";
   const blob = new Blob([build()], { type:"text/html;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = cleanSlug() + ".html";
+  a.download = file;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  return file;
 }
-$("dl").addEventListener("click", () => { download(); say("filemsg", "ダウンロードしました"); });
-$("cp").addEventListener("click", async () => {
-  try{ await copyText(build()); say("filemsg", "コピーしました"); }
-  catch(e){ say("filemsg", "コピーできませんでした。「ファイルにして持ち帰る」をお使いください"); }
+$("dl").addEventListener("click", () => {
+  const file = download();
+  $("doneFile").textContent = file;
+  $("done").className = "done on";
 });
 
 $("pub").addEventListener("click", () => {
-  const file = cleanSlug() + ".html";
-  window.open(`https://github.com/${REPO}/upload/${BRANCH}`, "_blank", "noopener");
-  download();
   const steps = $("pubsteps");
+  if (!repoOk()){
+    steps.className = "steps on";
+    steps.innerHTML = `<b>置き場所を入れてください。</b>
+      <p style="margin:6px 0 0">GitHub のアドレスが <code>github.com/yamada/homepage</code> なら、
+      <b>yamada/homepage</b> と入れます。</p>`;
+    return;
+  }
+  window.open(`https://github.com/${cleanRepo()}/upload/${BRANCH}`, "_blank", "noopener");
   steps.className = "steps on";
-  steps.innerHTML = `<b>ファイルはもう手元にあります。ひらいた GitHub の画面で：</b><ol>
+  steps.innerHTML = `<b>ひらいた GitHub の画面で：</b><ol>
     <li>「choose your files」を押す</li>
-    <li>いまダウンロードされた <b>${esc(file)}</b> をえらぶ（「ダウンロード」の中にあります）</li>
+    <li>上で保存した <b>${esc(cleanSlug() + ".html")}</b> をえらぶ</li>
     <li>下までスクロールして、緑の「Commit changes」を押す</li>
-    <li>1〜2分後に、上のアドレスをひらく</li></ol>
-  <p style="margin:8px 0 0">ファイルが画面にひらいてしまったときは、共有ボタンから「&quot;ファイル&quot;に保存」で保存してから、えらんでください。</p>`;
-  say("pubmsg", "ファイルを用意して、GitHub をひらきました");
+    <li>1〜2分待ってから、上のアドレスをひらく</li></ol>
+    <p style="margin:8px 0 0">まだ保存していない場合は、いちばん上の「ホームページを保存する」を先に押してください。</p>`;
+  say("pubmsg", "GitHub をひらきました");
 });
 
 /* ════════ とっておく ════════ */
