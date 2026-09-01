@@ -427,18 +427,42 @@ footer.credit a{color:var(--pink)}
   </details>
 
   <details class="fold">
-    <summary><span class="em">💾</span>とっておく・やり直す</summary>
+    <summary><span class="em">💾</span>とっておく</summary>
     <div class="fold-in">
       <p class="hint">書いたものは、この端末に自動で残ります。閉じても、次にひらくと続きからです。</p>
       <div class="btns">
         <button class="btn ghost" id="exportBtn" type="button">保存コードをコピー（別の端末に移すとき）</button>
         <button class="btn ghost" id="importBtn" type="button">保存コードを貼って読み込む</button>
-        <button class="btn ghost danger" id="resetBtn" type="button">ぜんぶ消して、はじめから</button>
       </div>
       <p class="msg" id="savemsg" role="status"></p>
       <p class="note">保存コードに写真は入りません（大きすぎるため）。写真だけ入れ直してください。</p>
     </div>
   </details>
+
+  <!-- 消したいとき。
+       折りたたみの中に入れない。やめたくなった人が探さずに見つけられる場所に置く。
+       ただし目立つ色にはしない。押してほしいボタンではないため。
+       ★「消す」には2種類あって、混ぜると事故になる:
+         ① この端末の下書き  → このアプリで消せる。戻せる
+         ② ネットに出したページ → このアプリでは消せない。GitHub で消す -->
+  <div class="step" id="eraseStep">
+    <h2><span class="em">🗑</span>やめたいとき・消したいとき</h2>
+
+    <p class="hint"><b>書いたものを消す</b>と、この端末の中がまっさらになります。
+      消したあと <b>20秒のあいだは元に戻せます</b>ので、安心して押してください。</p>
+    <button class="btn ghost danger" id="resetBtn" type="button">書いたものを、ぜんぶ消す</button>
+    <div class="done" id="undoBox">
+      <p class="done-t">✓ 消しました</p>
+      <button class="btn ghost" id="undoBtn" type="button">元に戻す（あと <span id="undoLeft">20</span> 秒）</button>
+    </div>
+    <p class="msg" id="erasemsg" role="status"></p>
+
+    <p class="way" style="margin:18px 0 12px"><b>ネットに出したページは、これでは消えません。</b><br>
+      上げたのは GitHub なので、消すのも GitHub の画面でやります。</p>
+    <button class="btn ghost" id="ghDel" type="button">GitHub の置き場所をひらく</button>
+    <div class="steps" id="ghDelSteps"></div>
+    <p class="note">消しても、1〜2分は見えたままのことがあります。少し待ってから確かめてください。</p>
+  </div>
 
   <footer class="credit">
     <p>つくったものは、保存するまで この端末の中だけにあります。</p>
@@ -625,21 +649,27 @@ function copyText(s){
 }
 
 let saveTimer;
+/* いま持っている中身を、その場で端末に書く。
+   ふだんは persist() から 0.5秒遅れで呼ばれるが、
+   「元に戻す」だけは待たずにここを直接呼ぶ。
+   戻した直後にアプリを閉じられても、戻した状態が残るように */
+function saveNow(){
+  const dot = $("savedot");
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify(S));
+    dot.textContent = "保存しました"; dot.classList.add("on");
+  }catch(e){
+    try{
+      localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign({}, S, {heroImg:null, works:[]})));
+      dot.textContent = "文章だけ保存（写真が多すぎます）"; dot.classList.add("on");
+    }catch(e2){ dot.textContent = "この端末では保存できません"; return; }
+  }
+  setTimeout(() => { dot.classList.remove("on"); dot.textContent = "自動保存"; }, 1800);
+}
+
 function persist(){
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    const dot = $("savedot");
-    try{
-      localStorage.setItem(STORE_KEY, JSON.stringify(S));
-      dot.textContent = "保存しました"; dot.classList.add("on");
-    }catch(e){
-      try{
-        localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign({}, S, {heroImg:null, works:[]})));
-        dot.textContent = "文章だけ保存（写真が多すぎます）"; dot.classList.add("on");
-      }catch(e2){ dot.textContent = "この端末では保存できません"; return; }
-    }
-    setTimeout(() => { dot.classList.remove("on"); dot.textContent = "自動保存"; }, 1800);
-  }, 500);
+  saveTimer = setTimeout(saveNow, 500);
 }
 
 let paintTimer;
@@ -1233,11 +1263,67 @@ $("importBtn").addEventListener("click", () => {
     say("savemsg", "読み込みました");
   }catch(e){ say("savemsg", "そのコードは読み込めませんでした"); }
 });
+/* ── 消す ──
+   「安心して押せる」の正体は、消せることではなく、戻せること。
+   だから確認ダイアログで止めるのではなく、消したあと20秒だけ戻り道を出す。
+   消える前の中身は、この変数の中にだけ持っておく（どこにも送らない） */
+const UNDO_SEC = 20;
+let undoSnap = null;
+let undoTimer = null;
+
+function undoEnd(){
+  clearInterval(undoTimer);
+  undoTimer = null;
+  undoSnap = null;
+  $("undoBox").className = "done";
+}
+
 $("resetBtn").addEventListener("click", () => {
-  if (!confirm("書いたもの・写真をぜんぶ消して、はじめからにします。いいですか？")) return;
+  // 続けて2回押されても、いちばん最初の中身を持ったままにする。
+  // 上書きすると、消したあとの空っぽが「戻り先」になってしまう
+  if (!undoSnap) undoSnap = JSON.parse(JSON.stringify(S));
   try{ localStorage.removeItem(STORE_KEY); }catch(e){}
   S = preset("denki");
   syncInputs(); buildPickers(); showUrl(); paint();
+
+  let left = UNDO_SEC;
+  $("undoLeft").textContent = left;
+  $("undoBox").className = "done on";
+  say("erasemsg", "");
+  clearInterval(undoTimer);
+  undoTimer = setInterval(() => {
+    left -= 1;
+    if (left <= 0){ undoEnd(); return; }
+    $("undoLeft").textContent = left;
+  }, 1000);
+});
+
+$("undoBtn").addEventListener("click", () => {
+  if (!undoSnap) return;
+  S = sanitize(undoSnap);
+  syncInputs(); buildPickers(); showUrl(); paint();
+  clearTimeout(saveTimer);
+  saveNow();
+  undoEnd();
+  say("erasemsg", "元に戻しました");
+});
+
+/* 出したページを消す道。ここでは消せないので、GitHub の画面まで連れて行くだけ */
+$("ghDel").addEventListener("click", () => {
+  const steps = $("ghDelSteps");
+  steps.className = "steps on";
+  if (!repoOk()){
+    steps.innerHTML = `<b>置き場所が入っていません。</b>
+      <p style="margin:6px 0 0">上の「インターネットのアドレスにしたい」をひらいて、
+      置き場所（例：<b>yamada/homepage</b>）を入れてから、もう一度押してください。</p>`;
+    return;
+  }
+  window.open(`https://github.com/${cleanRepo()}`, "_blank", "noopener");
+  steps.innerHTML = `<b>ひらいた GitHub の画面で：</b><ol>
+    <li>消したいファイル（例：<b>${esc(cleanSlug() + ".html")}</b>）の名前を押す</li>
+    <li>右上のごみ箱の印を押す</li>
+    <li>下までスクロールして、緑の「Commit changes」を押す</li></ol>
+    <p style="margin:8px 0 0">これでページは消えます。1〜2分は見えたままのことがあります。</p>`;
 });
 
 /* ════════ はじめの一回 ════════ */
