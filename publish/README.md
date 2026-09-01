@@ -53,9 +53,9 @@ Worker の画面 → **Settings** → **Variables and Secrets** → **Add**
 | 名前 | 種類 | 中身 |
 |---|---|---|
 | `GH_TOKEN` | **Secret** | 手順1でコピーした鍵 |
-| `REPO` | Text | `nakanointeria5963-alt/nobobb` |
+| `REPO` | Text | `roguepink/nobobb` |
 | `PASS` | **Secret** | 好きな合言葉（例：`nakano2026`） |
-| `ALLOW_ORIGIN` | Text | `https://nakanointeria5963-alt.github.io` |
+| `ALLOW_ORIGIN` | Text | `https://roguepink.github.io` |
 
 `GH_TOKEN` と `PASS` は必ず **Secret**（かくす）にしてください。
 
@@ -90,7 +90,7 @@ https://＜なにか＞.＜あなたの名前＞.workers.dev
 ## 公開されるアドレス
 
 ```
-https://nakanointeria5963-alt.github.io/nobobb/sites/＜ページの名前＞.html
+https://roguepink.github.io/nobobb/sites/＜ページの名前＞.html
 ```
 
 置いたあと、`main` から公開用に写す処理が走るので、**見られるようになるまで1〜2分**かかります。

@@ -213,7 +213,7 @@ let PUBLISH_API = "";
 
 ### 公開のしかた
 
-公開タブでページの名前を決めて「GitHub に出す」を押すと、①できあがったHTMLがダウンロードされ、②GitHub のアップロード画面がひらきます。ファイルをえらんで緑のボタンを押せば、`https://nakanointeria5963-alt.github.io/nobobb/＜名前＞.html` で公開されます。
+公開タブでページの名前を決めて「GitHub に出す」を押すと、①できあがったHTMLがダウンロードされ、②GitHub のアップロード画面がひらきます。ファイルをえらんで緑のボタンを押せば、`https://roguepink.github.io/nobobb/＜名前＞.html` で公開されます。
 
 同じ名前でもう一度出すと、上書き(作り直し)になります。
 
