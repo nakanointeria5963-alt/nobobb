@@ -3,341 +3,1273 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>おうちの応急処置</title>
-<meta name="description" content="水漏れ・停電・ガスのにおい。困ったときに、まず何をすればいいかを短くまとめたページです。">
-<meta name="theme-color" content="#a8471f">
+<title>ホームページ、つくってみる</title>
+<meta name="description" content="職人さん・小さな工務店のための、えらんで書き込むだけのホームページづくり。">
+<meta name="theme-color" content="#ff8fa8">
 <style>
 :root{
-  --bg:#f7f5f1; --card:#ffffff; --ink:#1d1a16; --muted:#6d6660;
-  --line:#e3ddd4; --accent:#a8471f; --accent-soft:#fbeee8;
-  --danger:#b3261e; --danger-soft:#fdecea; --ok:#2c6e4b; --ok-soft:#e9f4ee;
-  --radius:14px;
+  --bg:#fff7f9; --panel:#ffffff; --ink:#3b2b31; --muted:#907c84;
+  --line:#f2dfe5; --pink:#ff7d9c; --pink-soft:#ffeef2;
+  --shadow:0 3px 0 #f4dde3, 0 10px 26px -14px rgba(120,60,80,.35);
+  --r:22px;
 }
 @media (prefers-color-scheme:dark){
   :root{
-    --bg:#16140f; --card:#211e18; --ink:#f0ece5; --muted:#a49c92;
-    --line:#332e26; --accent:#e58a5e; --accent-soft:#33231b;
-    --danger:#f28b82; --danger-soft:#3a1f1c; --ok:#7fc79b; --ok-soft:#1b2f24;
+    --bg:#221a1e; --panel:#2e2429; --ink:#f6ecef; --muted:#b8a3ab;
+    --line:#3f333a; --pink:#ff96b0; --pink-soft:#3a2830;
+    --shadow:0 3px 0 #1a1417, 0 10px 26px -14px rgba(0,0,0,.6);
   }
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
   margin:0; background:var(--bg); color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;
-  font-size:17px; line-height:1.75; -webkit-font-smoothing:antialiased;
-}
-.wrap{max-width:680px; margin:0 auto; padding:0 18px 64px}
-
-header{padding:32px 0 20px}
-h1{font-size:1.7rem; line-height:1.35; margin:0 0 8px; letter-spacing:.01em}
-.lede{margin:0; color:var(--muted); font-size:.95rem}
-
-/* 緊急バー */
-.sos{
-  margin:20px 0 0; padding:14px 16px; border-radius:var(--radius);
-  background:var(--danger-soft); border:1px solid color-mix(in srgb,var(--danger) 30%,transparent);
-}
-.sos b{color:var(--danger)}
-.sos p{margin:6px 0 0; font-size:.9rem; color:var(--muted)}
-
-/* 検索 */
-.search{position:relative; margin:24px 0 12px}
-.search input{
-  width:100%; padding:14px 16px; font-size:1rem; font-family:inherit;
-  color:var(--ink); background:var(--card);
-  border:1px solid var(--line); border-radius:var(--radius);
-}
-.search input:focus{outline:2px solid var(--accent); outline-offset:1px}
-
-/* カテゴリ */
-.cats{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 22px}
-.cats button{
-  font-family:inherit; font-size:.9rem; padding:8px 15px; cursor:pointer;
-  color:var(--ink); background:var(--card);
-  border:1px solid var(--line); border-radius:999px;
-}
-.cats button[aria-pressed="true"]{
-  background:var(--accent); border-color:var(--accent); color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;
+  font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased;
 }
 
-/* カード */
-.card{
-  background:var(--card); border:1px solid var(--line);
-  border-radius:var(--radius); margin-bottom:10px; overflow:hidden;
+/* ── 上：できあがっていくところ ── */
+.stage{
+  position:sticky; top:0; z-index:20;
+  background:var(--bg); padding:10px 14px 0;
+  border-bottom:1px solid var(--line);
 }
-.card>summary{
-  list-style:none; cursor:pointer; padding:16px 18px;
-  display:flex; align-items:center; gap:10px; font-weight:600;
+.stage-head{
+  display:flex; align-items:center; gap:8px;
+  margin:0 0 8px; font-size:.8rem; color:var(--muted);
 }
-.card>summary::-webkit-details-marker{display:none}
-.card>summary::after{
-  content:"＋"; margin-left:auto; color:var(--muted); font-weight:400; flex:none;
+.stage-head b{color:var(--ink); font-size:.9rem}
+.savedot{margin-left:auto; font-size:.72rem; color:var(--muted); transition:color .3s}
+.savedot.on{color:var(--pink); font-weight:700}
+.phone{
+  position:relative; margin:0 auto; max-width:420px;
+  border:6px solid var(--panel); border-radius:26px;
+  box-shadow:var(--shadow); overflow:hidden; background:#fff;
 }
-.card[open]>summary::after{content:"−"}
-.card[open]>summary{border-bottom:1px solid var(--line)}
-.tag{
-  flex:none; font-size:.7rem; font-weight:700; letter-spacing:.04em;
-  padding:3px 8px; border-radius:999px;
-  background:var(--danger); color:#fff;
-}
-.body{padding:4px 18px 18px}
-.step{margin:16px 0 0}
-.step h3{
-  margin:0 0 6px; font-size:.82rem; font-weight:700; letter-spacing:.06em;
-  display:flex; align-items:center; gap:7px;
-}
-.step h3::before{content:""; width:9px; height:9px; border-radius:50%; flex:none}
-.step.do    h3{color:var(--ok)}      .step.do    h3::before{background:var(--ok)}
-.step.dont  h3{color:var(--danger)}  .step.dont  h3::before{background:var(--danger)}
-.step.call  h3{color:var(--accent)}  .step.call  h3::before{background:var(--accent)}
-.step ul{margin:0; padding-left:1.3em}
-.step li{margin:4px 0}
-.step li::marker{color:var(--muted)}
+.phone iframe{display:block; width:100%; height:40vh; min-height:220px; border:0}
+.phone.flash{animation:pop .32s ease}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.012)}100%{transform:scale(1)}}
 
-.empty{color:var(--muted); text-align:center; padding:40px 0}
-
-/* 連絡先メモ */
-.memo{
-  margin:36px 0 0; padding:20px 18px;
-  background:var(--accent-soft); border:1px solid var(--line); border-radius:var(--radius);
+.tabs{
+  display:flex; gap:4px; max-width:560px; margin:10px auto 0; padding-bottom:10px;
 }
-.memo h2{margin:0 0 4px; font-size:1.05rem}
-.memo p{margin:0 0 16px; font-size:.85rem; color:var(--muted)}
-.memo label{display:block; margin-bottom:12px; font-size:.85rem; color:var(--muted)}
-.memo input{
+.tabs button{
+  flex:1; font-family:inherit; font-size:.72rem; cursor:pointer;
+  padding:7px 2px 6px; border-radius:13px; border:2px solid transparent;
+  background:transparent; color:var(--muted);
+  display:grid; gap:1px; justify-items:center; line-height:1.3;
+}
+.tabs button .em{font-size:1.05rem}
+.tabs button[aria-selected="true"]{
+  background:var(--panel); border-color:var(--line); color:var(--ink);
+  font-weight:700; box-shadow:var(--shadow);
+}
+
+/* ── 下：えらぶ・かきこむ ── */
+.wrap{max-width:560px; margin:0 auto; padding:20px 16px 120px}
+.panel{display:none}
+.panel.on{display:block}
+
+.step{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  padding:18px 16px 16px; margin-bottom:14px; box-shadow:var(--shadow);
+}
+.step > h2{margin:0 0 2px; font-size:1rem; display:flex; align-items:center; gap:8px}
+.step > h2 .em{font-size:1.1rem}
+.hint{margin:0 0 14px; font-size:.79rem; color:var(--muted)}
+.hint.tight{margin-bottom:8px}
+
+.opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:9px}
+.opts.tight{grid-template-columns:repeat(auto-fit,minmax(96px,1fr))}
+.opt{
+  font-family:inherit; font-size:.88rem; text-align:left; cursor:pointer;
+  padding:11px 12px; color:var(--ink); background:var(--bg);
+  border:2px solid var(--line); border-radius:15px;
+  display:flex; align-items:center; gap:8px; transition:transform .12s, border-color .12s;
+}
+.opt .em{font-size:1.1rem; line-height:1}
+.opt:active{transform:scale(.96)}
+.opt[aria-pressed="true"]{border-color:var(--pink); background:var(--pink-soft); font-weight:700}
+.opt[aria-pressed="true"]::after{content:"✓"; margin-left:auto; color:var(--pink); font-weight:700}
+
+.swatches{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.sw{
+  cursor:pointer; width:38px; height:38px; padding:0;
+  border:3px solid var(--line); border-radius:50%;
+  transition:transform .12s;
+}
+.sw:active{transform:scale(.9)}
+.sw[aria-pressed="true"]{border-color:var(--pink); transform:scale(1.12)}
+.sw.auto{
+  background:var(--bg); font-size:.62rem; color:var(--muted); font-family:inherit;
+  width:auto; height:38px; border-radius:999px; padding:0 12px;
+}
+.sw.auto[aria-pressed="true"]{color:var(--pink); font-weight:700}
+input[type=color]{
+  width:38px; height:38px; padding:2px; border:3px solid var(--line);
+  border-radius:50%; background:var(--bg); cursor:pointer;
+}
+
+label.field{display:block; margin-bottom:11px; font-size:.8rem; color:var(--muted)}
+label.field input, label.field textarea{
   display:block; width:100%; margin-top:4px; padding:11px 13px;
   font-size:1rem; font-family:inherit; color:var(--ink);
-  background:var(--card); border:1px solid var(--line); border-radius:10px;
+  background:var(--bg); border:2px solid var(--line); border-radius:14px;
 }
-.memo input:focus{outline:2px solid var(--accent); outline-offset:1px}
-.saved{font-size:.8rem; color:var(--ok); min-height:1.4em; margin:0}
+label.field textarea{min-height:86px; line-height:1.7; resize:vertical}
+label.field input:focus, label.field textarea:focus{outline:none; border-color:var(--pink)}
+.two{display:grid; grid-template-columns:1fr 1fr; gap:0 10px}
 
-footer{margin-top:36px; padding-top:20px; border-top:1px solid var(--line);
-  font-size:.82rem; color:var(--muted)}
-footer p{margin:0 0 8px}
-footer a{color:var(--accent)}
+/* 行の編集（できること・写真） */
+.rows{display:grid; gap:10px}
+.row{
+  background:var(--bg); border:2px solid var(--line); border-radius:15px;
+  padding:11px 12px;
+}
+.row .rline{display:flex; gap:8px; margin-bottom:7px; align-items:center}
+.row .rline:last-child{margin-bottom:0}
+.row input{
+  flex:1; min-width:0; padding:8px 11px; font-size:.95rem; font-family:inherit;
+  color:var(--ink); background:var(--panel); border:1.5px solid var(--line); border-radius:11px;
+}
+.row input:focus{outline:none; border-color:var(--pink)}
+.row .del{
+  flex:none; width:36px; height:36px; border:none; background:transparent; cursor:pointer;
+  color:var(--muted); font-size:1.05rem; border-radius:10px;
+}
+.row .del:active{background:var(--pink-soft)}
+.row img{width:52px; height:52px; object-fit:cover; border-radius:10px; flex:none}
+.addrow{
+  margin-top:10px; width:100%; font-family:inherit; font-size:.9rem; font-weight:700;
+  padding:11px; cursor:pointer; color:var(--pink);
+  background:var(--pink-soft); border:2px dashed var(--pink); border-radius:14px;
+}
+
+.btn{
+  font-family:inherit; font-size:.95rem; font-weight:700; cursor:pointer;
+  padding:14px; border-radius:15px; border:2px solid var(--pink);
+  background:var(--pink); color:#fff; transition:transform .12s; width:100%;
+}
+.btn.ghost{background:var(--panel); color:var(--pink)}
+.btn.line{background:#16a34a; border-color:#16a34a}
+.btn:active{transform:scale(.97)}
+.btns{display:grid; gap:9px}
+.msg{margin:10px 0 0; min-height:1.4em; font-size:.82rem; color:var(--pink); font-weight:700}
+
+.toggles{display:grid; grid-template-columns:1fr 1fr; gap:9px}
+
+.puburl{
+  margin:0 0 12px; padding:10px 12px; font-size:.76rem; word-break:break-all;
+  background:var(--bg); border-radius:12px; color:var(--pink); font-weight:700;
+}
+.steps{
+  margin:12px 0 0; padding:13px 14px; font-size:.83rem;
+  background:var(--pink-soft); border-radius:14px; display:none;
+}
+.steps.on{display:block}
+.steps ol{margin:6px 0 0; padding-left:1.3em}
+.steps li{margin:4px 0}
+.note{margin:10px 0 0; font-size:.75rem; color:var(--muted)}
+.danger{border-color:var(--line); color:var(--muted); background:var(--panel)}
+
+/* 公開タブ */
+.big{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  padding:26px 18px 22px; margin-bottom:14px; box-shadow:var(--shadow); text-align:center;
+}
+.big-lede{margin:0 0 18px; font-size:1.15rem; font-weight:700}
+.big-btn{font-size:1.1rem; padding:20px}
+.done{display:none; margin-top:16px; padding:15px 14px; border-radius:15px; background:var(--pink-soft)}
+.done.on{display:block}
+.done-t{margin:0 0 4px; font-weight:700; color:var(--pink)}
+.done-file{margin:0 0 6px; font-size:.95rem; font-weight:700; word-break:break-all}
+.done-w{margin:0; font-size:.8rem; color:var(--muted)}
+.big-note{margin:16px 0 0; font-size:.85rem; color:var(--muted); line-height:1.8}
+.big .field{text-align:left}
+.liveurl{
+  margin:0 0 14px; padding:12px 13px; font-size:.85rem; font-weight:700;
+  word-break:break-all; line-height:1.6;
+  background:var(--panel); border-radius:12px; color:var(--pink);
+}
+#openUrl{display:block; text-align:center; text-decoration:none; line-height:normal}
+
+.fold{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  margin-bottom:14px; box-shadow:var(--shadow); overflow:hidden;
+}
+.fold > summary{
+  list-style:none; cursor:pointer; padding:17px 18px; font-size:.95rem; font-weight:700;
+  display:flex; align-items:center; gap:9px;
+}
+.fold > summary::-webkit-details-marker{display:none}
+.fold > summary::after{content:"＋"; margin-left:auto; color:var(--muted); font-weight:400}
+.fold[open] > summary::after{content:"−"}
+.fold[open] > summary{border-bottom:1px solid var(--line)}
+.fold-in{padding:16px 16px 18px}
+.way{margin:0 0 18px; padding:14px 15px; background:var(--bg); border-radius:14px; font-size:.86rem}
+.way2{margin:0 0 12px; font-size:.86rem}
+
+footer.credit{margin-top:22px; font-size:.78rem; color:var(--muted); text-align:center}
+footer.credit a{color:var(--pink)}
+
+@media (min-width:900px){
+  body{display:grid; grid-template-columns:1fr 1fr; align-items:start}
+  .stage{position:sticky; top:0; height:100vh; display:flex; flex-direction:column;
+    justify-content:center; border-bottom:0; border-right:1px solid var(--line); padding:20px}
+  .phone iframe{height:68vh}
+  .wrap{padding-top:26px}
+}
 </style>
 </head>
 <body>
+
+<div class="stage">
+  <p class="stage-head"><b>できあがっていくところ</b><span class="savedot" id="savedot">自動保存</span></p>
+  <div class="phone" id="phonebox"><iframe id="pv" title="ホームページのプレビュー" sandbox=""></iframe></div>
+  <nav class="tabs" id="tabs" aria-label="つくる項目"></nav>
+</div>
+
 <div class="wrap">
 
-<header>
-  <h1>おうちの応急処置</h1>
-  <p class="lede">水漏れ、ブレーカー、ガスのにおい。<br>あわてる前に、まずこれだけ。</p>
-</header>
-
-<div class="sos">
-  <b>火が出ている・けむりが出ている・ガスのにおいが強いときは、何もせず外へ。</b>
-  <p>火事 119 ／ ガス漏れは外に出てからガス会社へ</p>
-</div>
-
-<div class="search">
-  <input id="q" type="search" placeholder="困っていることを入れる（例：水、ドア、におい）" aria-label="困っていることで探す">
-</div>
-
-<nav class="cats" id="cats" aria-label="種類でしぼる"></nav>
-
-<main id="list"></main>
-<p class="empty" id="empty" hidden>その言葉では見つかりませんでした。<br>別の言い方で探してみてください。</p>
-
-<section class="memo">
-  <h2>いざという時の連絡先</h2>
-  <p>ここに入れておくと、この端末に残ります。困った時に探さなくて済みます。</p>
-  <label>管理会社・大家さん<input id="c1" type="tel" placeholder="電話番号"></label>
-  <label>水道の業者<input id="c2" type="tel" placeholder="電話番号"></label>
-  <label>電気の業者<input id="c3" type="tel" placeholder="電話番号"></label>
-  <label>ガス会社<input id="c4" type="tel" placeholder="電話番号"></label>
-  <p class="saved" id="saved" role="status"></p>
+<!-- ─────── おみせ ─────── -->
+<section class="panel" data-tab="mise">
+  <div class="step">
+    <h2><span class="em">🧰</span>しごとの種類</h2>
+    <p class="hint">えらぶと、見本の文章がその仕事むけに入れ替わります。自分で書き換えた文章は、そのまま残ります。</p>
+    <div class="opts" id="trade"></div>
+  </div>
+  <div class="step">
+    <h2><span class="em">🏪</span>名前と、ひとこと</h2>
+    <p class="hint">打つそばから、上に反映されます。</p>
+    <label class="field">屋号・お店の名前<input id="f-name" type="text" autocomplete="off"></label>
+    <label class="field">ひとこと（いちばん伝えたいこと）<input id="f-tag" type="text" autocomplete="off"></label>
+  </div>
+  <div class="step">
+    <h2><span class="em">📞</span>連絡先</h2>
+    <p class="hint">電話番号を入れると、ページの下に「電話する」ボタンが出ます。空欄のものは載りません。</p>
+    <label class="field">電話番号<input id="f-phone" type="tel" placeholder="例：090-0000-0000" autocomplete="off"></label>
+    <label class="field">メールアドレス<input id="f-email" type="email" placeholder="例：oshigoto@example.com" autocomplete="off"></label>
+    <label class="field">LINE ID（あれば）<input id="f-line" type="text" placeholder="例：@nakano-naiso" autocomplete="off"></label>
+  </div>
+  <div class="step">
+    <h2><span class="em">🏷</span>しるし</h2>
+    <p class="hint">名前のそばに付く小さな札です。当てはまるものだけ。</p>
+    <div class="toggles" id="badges"></div>
+  </div>
 </section>
 
-<footer>
-  <p>書いてあるのは、業者が来るまでの間にできることの目安です。<br>
-  少しでも危ないと感じたら、無理をせず専門の業者を呼んでください。</p>
-  <p>賃貸にお住まいの場合は、自分で直す前に管理会社へ一報を。<br>
-  あとの費用の話が変わることがあります。</p>
-  <p><a href="tsukuru/">ホームページ、つくってみる →</a></p>
-</footer>
+<!-- ─────── しゃしん ─────── -->
+<section class="panel" data-tab="photo">
+  <div class="step">
+    <h2><span class="em">🌄</span>いちばん上の写真</h2>
+    <p class="hint">仕事場や道具、仕上がりの写真。ここが決まると、ページの顔が決まります。写真は自動で軽くしてから入れます。</p>
+    <div class="rows" id="heroRow"></div>
+    <input id="heroFile" type="file" accept="image/*" hidden>
+    <button class="addrow" id="heroPick" type="button">＋ 写真をえらぶ</button>
+  </div>
+  <div class="step">
+    <h2><span class="em">📷</span>仕事の写真（施工例）</h2>
+    <p class="hint">8枚まで。ひとことを添えると、ぐっと伝わります（例：施工前 → 施工後）。</p>
+    <div class="rows" id="workRows"></div>
+    <input id="workFile" type="file" accept="image/*" multiple hidden>
+    <button class="addrow" id="workPick" type="button">＋ 写真を足す</button>
+  </div>
+</section>
+
+<!-- ─────── デザイン ─────── -->
+<section class="panel" data-tab="design">
+  <div class="step">
+    <h2><span class="em">🖼</span>いちばん上の見せ方</h2>
+    <div class="opts" id="heroStyle" style="margin-top:10px"></div>
+  </div>
+  <div class="step">
+    <h2><span class="em">🎨</span>色</h2>
+    <p class="hint tight">ぜんたいの色</p>
+    <div class="swatches" id="mainColors"></div>
+    <p class="hint tight" style="margin-top:14px">ボタンなど、目立たせる色</p>
+    <div class="swatches" id="accentColors"></div>
+    <p class="hint tight" style="margin-top:14px">背景</p>
+    <div class="opts tight" id="bgTone"></div>
+  </div>
+  <div class="step">
+    <h2><span class="em">✒️</span>文字の感じ</h2>
+    <div class="opts tight" id="font" style="margin-top:10px"></div>
+  </div>
+  <div class="step">
+    <h2><span class="em">⬜</span>かたち</h2>
+    <p class="hint tight">角のまるさ</p>
+    <div class="opts tight" id="radius"></div>
+    <p class="hint tight" style="margin-top:14px">中身の見せ方</p>
+    <div class="opts tight" id="sectionStyle"></div>
+  </div>
+</section>
+
+<!-- ─────── のせるもの ─────── -->
+<section class="panel" data-tab="naiyou">
+  <div class="step">
+    <h2><span class="em">📋</span>のせるもの</h2>
+    <p class="hint">押すと増えて、もう一度押すと消えます。えらんだものの書き込み欄が、下に出ます。</p>
+    <div class="toggles" id="parts"></div>
+  </div>
+  <div class="step" data-part="greeting">
+    <h2><span class="em">💬</span>あいさつ文</h2>
+    <p class="hint">かしこまらなくて大丈夫。ふだんお客さんに話していることを、そのまま。</p>
+    <label class="field"><textarea id="f-greeting"></textarea></label>
+  </div>
+  <div class="step" data-part="services">
+    <h2><span class="em">🔧</span>できること・料金</h2>
+    <p class="hint">料金は「〜」や「現地を見てから」でも大丈夫。書ける範囲で。</p>
+    <div class="rows" id="svcRows"></div>
+    <button class="addrow" id="svcAdd" type="button">＋ 仕事を足す</button>
+  </div>
+  <div class="step" data-part="flow">
+    <h2><span class="em">🚶</span>たのみ方の流れ</h2>
+    <div class="rows" id="flowRows" style="margin-top:10px"></div>
+  </div>
+  <div class="step" data-part="voice">
+    <h2><span class="em">🗣</span>お客さまの声</h2>
+    <p class="hint">実際に言われたことを、短く。</p>
+    <label class="field">その1<textarea id="f-voice0" style="min-height:60px"></textarea></label>
+    <label class="field">その2<textarea id="f-voice1" style="min-height:60px"></textarea></label>
+  </div>
+  <div class="step" data-part="faq">
+    <h2><span class="em">❓</span>よくある質問</h2>
+    <div id="faqBox" style="margin-top:10px"></div>
+  </div>
+  <div class="step" data-part="area">
+    <h2><span class="em">📍</span>対応エリア</h2>
+    <label class="field" style="margin-top:10px"><input id="f-area" type="text" autocomplete="off"></label>
+  </div>
+  <div class="step" data-part="hours">
+    <h2><span class="em">🕒</span>営業時間</h2>
+    <div class="two" style="margin-top:10px">
+      <label class="field">時間<input id="f-hours" type="text" autocomplete="off"></label>
+      <label class="field">お休み<input id="f-holiday" type="text" autocomplete="off"></label>
+    </div>
+  </div>
+  <div class="step">
+    <h2><span class="em">📜</span>資格・許可（あれば）</h2>
+    <label class="field" style="margin-top:10px"><input id="f-quals" type="text" placeholder="例：第二種電気工事士" autocomplete="off"></label>
+  </div>
+</section>
+
+<!-- ─────── 公開 ─────── -->
+<section class="panel" data-tab="open">
+
+  <div class="big">
+    <p class="big-lede">ホームページが できました</p>
+
+    <div id="autoBox" hidden>
+      <label class="field">ページの名前（英数字とハイフン）
+        <input id="slug" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <label class="field">合言葉
+        <input id="pass" type="password" autocomplete="off" placeholder="教わった合言葉"></label>
+      <button class="btn big-btn" id="go" type="button">ネットに出す</button>
+      <p class="msg" id="gomsg" role="status"></p>
+
+      <div class="done" id="live">
+        <p class="done-t">✓ ネットに出ました</p>
+        <p class="liveurl" id="liveUrl"></p>
+        <div class="btns">
+          <button class="btn line" id="lineShare" type="button">LINE で送る</button>
+          <button class="btn ghost" id="copyUrl" type="button">アドレスを コピー</button>
+          <button class="btn ghost" id="otherShare" type="button">ほかのアプリで送る</button>
+          <a class="btn ghost" id="openUrl" target="_blank" rel="noopener">ひらいて 見てみる</a>
+        </div>
+        <p class="done-w">見られるようになるまで、1〜2分かかります。<br>
+          このアドレスを、名刺やチラシに書けます。</p>
+      </div>
+
+      <p class="big-note">同じ名前でもう一度出すと、新しいものに入れ替わります。</p>
+    </div>
+
+    <div id="manualBox">
+      <button class="btn big-btn" id="dl" type="button">ホームページを 保存する</button>
+      <div class="done" id="done">
+        <p class="done-t">✓ 保存しました</p>
+        <p class="done-file" id="doneFile"></p>
+        <p class="done-w">スマホの「ファイル」か「ダウンロード」の中に入っています。</p>
+      </div>
+      <p class="big-note">保存されるのは <b>1つのファイル</b>です。<br>
+        これが、ホームページそのものです。</p>
+    </div>
+  </div>
+
+  <div class="step" id="shareStep">
+    <h2><span class="em">📨</span>人に見せる</h2>
+    <p class="hint" style="margin-bottom:0">
+      <b>メールなら</b>、保存したファイルをそのまま添付して送れます。受け取った人は押すだけで見られます。<br>
+      <b>LINE は、この種類のファイルを受け付けません</b>（「送信できませんでした」と出ます）。
+      LINE で見せたいときは、下の「インターネットのアドレスにしたい」でアドレスを作って、
+      <b>そのアドレスを送って</b>ください。アドレスなら必ず送れます。</p>
+  </div>
+
+  <details class="fold" id="ghFold">
+    <summary><span class="em">🌐</span>インターネットのアドレスにしたい</summary>
+    <div class="fold-in">
+      <p class="hint">「https://…」のアドレスを作って、誰でも見られるようにする方法です。
+        <b>LINE で人に見せたいときは、こちらが確実です</b>（アドレスなら LINE でも必ず送れます）。</p>
+
+      <p class="way"><b>いちばん簡単なのは、詳しい人に頼むこと。</b><br>
+        保存したファイルを渡して「これをネットに上げてほしい」と言えば、それで終わりです。
+        ホームページの中身は、もう全部このファイルに入っています。</p>
+
+      <p class="way2"><b>自分の GitHub を持っている人へ</b></p>
+      <label class="field">置き場所（あなたのリポジトリ）
+        <input id="repo" type="text" placeholder="例：yamada/homepage" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <p class="puburl" id="puburl"></p>
+      <button class="btn ghost" id="pub" type="button">GitHub の置き場所をひらく</button>
+      <div class="steps" id="pubsteps"></div>
+      <p class="msg" id="pubmsg" role="status"></p>
+      <button class="btn line" id="lineShare2" type="button" style="margin-top:12px">できたアドレスを LINE で送る</button>
+      <p class="note">緑のボタンを押して1〜2分たってから、送ってください。</p>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary><span class="em">💾</span>とっておく・やり直す</summary>
+    <div class="fold-in">
+      <p class="hint">書いたものは、この端末に自動で残ります。閉じても、次にひらくと続きからです。</p>
+      <div class="btns">
+        <button class="btn ghost" id="exportBtn" type="button">保存コードをコピー（別の端末に移すとき）</button>
+        <button class="btn ghost" id="importBtn" type="button">保存コードを貼って読み込む</button>
+        <button class="btn ghost danger" id="resetBtn" type="button">ぜんぶ消して、はじめから</button>
+      </div>
+      <p class="msg" id="savemsg" role="status"></p>
+      <p class="note">保存コードに写真は入りません（大きすぎるため）。写真だけ入れ直してください。</p>
+    </div>
+  </details>
+
+  <footer class="credit">
+    <p>つくったものは、保存するまで この端末の中だけにあります。</p>
+  </footer>
+</section>
 
 </div>
 
 <script>
-const ITEMS = [
-  {
-    cat:"水まわり", urgent:false,
-    title:"蛇口から水が止まらない",
-    words:"じゃぐち 水漏れ ぽたぽた カラン 洗面 台所",
-    do:["流し台や洗面台の下にある「止水栓」を、マイナスドライバーか手で右に回して閉める。","見つからなければ、家の外の水道メーターの箱にある元栓を閉める。","閉めるとき、何回まわしたか覚えておく。戻すときに同じだけ戻せます。"],
-    dont:["ハンドルを力任せに締め続けない。中のゴムがつぶれて、もっと漏れます。"],
-    call:["止水栓を閉めても漏れが止まらない。","蛇口の根元や、台の下の床が濡れている。"]
-  },
-  {
-    cat:"水まわり", urgent:false,
-    title:"トイレが流れない・あふれそう",
-    words:"トイレ つまり 詰まり 便器 あふれる 流れない ラバーカップ",
-    do:["まずレバーを回すのをやめる。もう一度流すと、あふれます。","便器の横か後ろの壁にある止水栓を閉める。","ラバーカップ（すっぽん）を排水口にぴったり当て、ゆっくり押して、勢いよく引く。引くときに取れます。"],
-    dont:["熱いお湯を入れない。便器が割れることがあります。ぬるま湯まで。","おもちゃやスマホなど固いものを落とした時は、流そうとしない。奥で完全に詰まります。"],
-    call:["30分ためしても水が引かない。","便器の外に水が出てきた。"]
-  },
-  {
-    cat:"水まわり", urgent:false,
-    title:"台所・洗面の水が流れていかない",
-    words:"排水 つまり 詰まり シンク 洗面 流れない におい ぬめり",
-    do:["排水口のフタとゴミ受けを外して、たまった物を取る。","重曹をふりかけ、その上からお酢かクエン酸をかけて30分おき、ぬるま湯で流す。","それでも駄目なら、水を少しためてラバーカップ。"],
-    dont:["熱湯を一気に流さない。排水管が変形することがあります。","市販の薬剤を何種類も混ぜない。危ないガスが出ます。"],
-    call:["家じゅうの排水が同時に流れにくい。（下水側の詰まりかもしれません）"]
-  },
-  {
-    cat:"水まわり", urgent:true,
-    title:"天井から水が落ちてくる",
-    words:"天井 漏水 雨漏り 上の階 しみ 水 落ちる",
-    do:["下にバケツと新聞紙。まわりの家電のコンセントを抜く。","濡れている場所のブレーカーを落とす。","写真を撮っておく。あとの話し合いで必ず要ります。","集合住宅なら、上の階か管理会社にすぐ連絡。"],
-    dont:["濡れた照明やコンセントに触らない。感電します。","天井のふくらみを自分で突かない。一気に落ちてきます。"],
-    call:["すぐに呼んでください。放っておくと、下の階まで広がります。"]
-  },
-  {
-    cat:"電気", urgent:false,
-    title:"ブレーカーが落ちた",
-    words:"ブレーカー 停電 電気 消えた 落ちる 分電盤",
-    do:["分電盤を開け、まず右側の小さいスイッチを全部オフにする。","次に一番大きい主幹スイッチをオン。","小さいスイッチを一つずつオンにしていく。落ちた瞬間の一つが原因の部屋です。","その部屋で使っていた家電を減らす。特に電子レンジ・ドライヤー・電気ポットの同時使用。"],
-    dont:["濡れた手で触らない。","落ちたブレーカーを、原因を確かめずに何度も上げ直さない。"],
-    call:["同じ回路だけが、何もしていないのに何度も落ちる。（漏電の可能性があります）"]
-  },
-  {
-    cat:"電気", urgent:true,
-    title:"コンセントが熱い・焦げくさい",
-    words:"コンセント 焦げ こげ におい 熱い 火花 タコ足",
-    do:["その部屋のブレーカーを落とす。","冷めてからプラグを抜く。","そのコンセントは、直るまで使わない。"],
-    dont:["水をかけない。","そのまま使い続けない。火事のもとです。"],
-    call:["すぐに呼んでください。焦げ跡があるなら、コンセント自体の交換が要ります。"]
-  },
-  {
-    cat:"建具", urgent:false,
-    title:"ドアが閉まらない・きしむ",
-    words:"ドア 扉 閉まらない きしむ 音 蝶番 ちょうつがい",
-    do:["蝶番（ちょうつがい）のネジを、プラスドライバーで締め直す。ゆるんでいるだけのことが多いです。","きしむ音には、シリコン系の潤滑スプレーを蝶番の軸に少しだけ。"],
-    dont:["油の多いスプレーをレールや床側に使わない。ホコリを吸って、あとでもっと動かなくなります。","反りが出ているドアを、無理に押し込んで閉めない。枠まで傷みます。"],
-    call:["ネジを締めても直らない。枠ごとゆがんでいる可能性があります。"]
-  },
-  {
-    cat:"建具", urgent:false,
-    title:"引き戸・網戸が重い、外れる",
-    words:"引き戸 網戸 サッシ 重い 外れる レール 戸車",
-    do:["レールの溝を、掃除機と歯ブラシで掃除する。これだけで直ることがよくあります。","戸の下側にある戸車の調整ネジを、少しずつ回して高さを合わせる。","網戸は、上に持ち上げてから手前に引くと外れます。"],
-    dont:["外れたまま無理に力をかけない。レールがつぶれます。"],
-    call:["レールがへこんでいる、サッシが動かない。"]
-  },
-  {
-    cat:"壁・床", urgent:false,
-    title:"壁に穴があいた・傷がついた",
-    words:"壁 穴 きず 傷 クロス 剥がれ めくれ 石膏ボード",
-    do:["画びょう程度の穴なら、そのままで大丈夫です。","500円玉くらいまでなら、ホームセンターの補修用パテで埋めて、乾かして平らにする。","クロスのめくれは、専用のジョイントコークかクロス用のりで押さえる。"],
-    dont:["賃貸で、自分で大きく直そうとしない。かえって費用が上がることがあります。"],
-    call:["こぶし以上の穴。裏の板ごと直す作業になります。"]
-  },
-  {
-    cat:"壁・床", urgent:false,
-    title:"床がきしむ・ぶかぶかする",
-    words:"床 きしむ 音 ぶかぶか 浮く たわむ フローリング",
-    do:["きしむ場所と範囲を覚えておく。歩くたびに鳴るのか、一箇所だけかで原因が変わります。","水まわりの近くなら、その下で水が漏れていないか見る。"],
-    dont:["ぶかぶかする場所を、重い物を置いてごまかさない。"],
-    call:["踏むと沈む、ぶかぶかする。下の板が傷んでいる可能性が高いです。"]
-  },
-  {
-    cat:"におい・カビ", urgent:false,
-    title:"窓や壁にカビが出た",
-    words:"カビ かび 結露 黒い 窓 押入れ 湿気 におい",
-    do:["消毒用エタノールを吹いて、乾いた布で拭き取る。","そのあと換気。1日5分でも、窓を2ヶ所開けて空気を通す。","家具は壁から5センチ離して置く。裏に空気が通ります。"],
-    dont:["塩素系の漂白剤と、酸性の洗剤を一緒に使わない。有毒なガスが出ます。","カビをかわいた状態でこすらない。胞子が舞います。"],
-    call:["壁の内側から広がっている、拭いてもすぐ戻る。"]
-  },
-  {
-    cat:"におい・カビ", urgent:false,
-    title:"排水口から下水のにおい",
-    words:"におい 臭い 下水 排水 洗濯機 風呂 封水",
-    do:["しばらく使っていない排水口に、コップ一杯の水を流す。乾いて、においを止めるフタ（水）が切れているだけのことが多いです。","洗濯機の排水ホースの根元も同じ。専用の部品で塞ぐと止まります。"],
-    dont:["消臭剤で上から隠さない。原因が残ります。"],
-    call:["水を流してもにおう。配管の外れや割れかもしれません。"]
-  },
-  {
-    cat:"緊急", urgent:true,
-    title:"ガスのにおいがする",
-    words:"ガス におい 臭い 漏れ プロパン 都市ガス",
-    do:["火を一切つけない。","窓とドアを大きく開ける。","ガスの元栓とメーターのコックを閉める。","外に出てから、ガス会社に電話する。"],
-    dont:["換気扇や電気のスイッチに触らない。入れるのも切るのも駄目です。火花が出ます。","家の中で電話をかけない。"],
-    call:["すぐにガス会社へ。番号は下の連絡先メモに入れておいてください。"]
-  },
-  {
-    cat:"緊急", urgent:true,
-    title:"地震のあと、家を確認する",
-    words:"地震 揺れ あと 確認 点検 チェック",
-    do:["ガスのにおいがしないか。したら上の項目へ。","水が漏れていないか。台所・洗面・トイレ・給湯器のまわり。","ブレーカーを入れる前に、家電のプラグを一度抜く。倒れた家電が原因で火が出ることがあります。","壁や柱に、新しいひび割れが入っていないか写真を撮る。"],
-    dont:["傾いた家具を一人で起こさない。","ひび割れた壁に体重をかけない。"],
-    call:["柱や梁にひびがある、ドアや窓が開かなくなった。建物のゆがみかもしれません。"]
-  }
+"use strict";
+/* ════════ えらべるもの ════════ */
+const FLOW_DEFAULT = [
+  "お電話か LINE でご連絡ください",
+  "日にちを決めて、現地を見せてもらいます",
+  "お見積りを出します。納得いただいてから進めます",
+  "作業して、確認してもらって、お引き渡しです"
 ];
+const TRADES = {
+  denki:{ em:"⚡", label:"電気工事", name:"さとう電気工事", tag:"コンセント1つから、伺います。",
+    greeting:"この地域で電気工事をしています。スイッチの交換のような小さな仕事ほど、頼み先に困ると思います。うちは1つから伺います。\n電気は資格のいる仕事です。ご自分でいじる前に、一度お電話ください。",
+    services:[["コンセントの増設","8,000円〜",""],["照明器具の取り付け","5,000円〜","器具はお持ち込みでも"],["スイッチの交換","6,000円〜",""],["分電盤の交換","45,000円〜","現地を見てから"]],
+    quals:"第二種電気工事士",
+    faq:[["何度も落ちるブレーカーも見てもらえますか？","はい。原因を調べるところからやります。漏電の場合は急ぎで対応します。"],
+         ["賃貸でも頼めますか？","大家さん・管理会社の了承があれば大丈夫です。"]],
+    voice:["スイッチ1つでも嫌な顔をせず来てくれました。","原因の説明が分かりやすかったです。"] },
+  suido:{ em:"🔧", label:"水道・設備", name:"たなか設備", tag:"水のトラブル、まず止めます。",
+    greeting:"水漏れやつまりは、待ってくれません。まず水を止めて、落ち着いて直す。それがこの仕事の順番です。\n夜間の応急のご相談も、できる限り受けます。",
+    services:[["蛇口の交換","8,000円〜",""],["水漏れの修理","5,000円〜",""],["トイレのつまり","8,000円〜",""],["給湯器の交換","","現地を見てから"]],
+    quals:"給水装置工事主任技術者",
+    faq:[["夜でも来てもらえますか？","まずお電話ください。伺えない時間でも、水の止め方を電話でご案内します。"],
+         ["見てもらうだけでも大丈夫ですか？","大丈夫です。お見積りまでは無料です。"]],
+    voice:["電話口で水の止め方を教えてくれて助かりました。","料金が先にはっきりしていて安心でした。"] },
+  kurosu:{ em:"🏠", label:"クロス・内装", name:"なかのインテリア", tag:"住まいのことなら、なんでも。",
+    greeting:"クロスの張り替えを中心に、内装まわりの仕事をしています。\n張り替えは、剥がしてみないと分からない下地がいちばん大事です。だから、うちは現地を見てから値段を出します。",
+    services:[["クロスの張り替え（6畳）","40,000円〜",""],["網戸の張り替え","3,000円〜",""],["建具の修理","5,000円〜",""],["床の張り替え","","現地を見てから"]],
+    quals:"内装仕上げ施工技能士",
+    faq:[["1部屋だけでも頼めますか？","もちろんです。トイレだけ、壁1面だけでも伺います。"],
+         ["家具は動かしておくほうがいいですか？","大きい物はこちらで動かします。小物だけまとめておいてもらえると助かります。"]],
+    voice:["継ぎ目がどこか分からない仕上がりでした。","見積のときに下地の説明までしてくれました。"] },
+  tosou:{ em:"🎨", label:"塗装", name:"すずき塗装店", tag:"塗る前の、下ごしらえから。",
+    greeting:"塗装の善し悪しは、塗る前の洗いとサビ落としでほとんど決まります。\n仕上がりの色は写真ではなく、実物に試し塗りをしてお見せします。",
+    services:[["外壁の塗り替え","","現地を見てから"],["屋根の塗り替え","","現地を見てから"],["室内の塗り替え（1面）","15,000円〜",""],["鉄部のサビ止め","10,000円〜",""]],
+    quals:"塗装技能士",
+    faq:[["工事のあいだ、家にいないとだめですか？","外まわりならお留守で大丈夫です。毎日の終わりに、進み具合を写真でお送りします。"],
+         ["色で迷っています。","実際の壁に試し塗りをしてから決められます。急がせません。"]],
+    voice:["ご近所への挨拶までしてくれました。","毎日写真の報告があって安心でした。"] },
+  daiku:{ em:"🔨", label:"大工・リフォーム", name:"やまだ工務店", tag:"棚ひとつも、一軒まるごとも。",
+    greeting:"大工仕事を中心に、住まいの直しごとを受けています。\n大きな工事だけでなく、建て付けの調整や手すり1本の取り付けも、大事な仕事です。",
+    services:[["手すりの取り付け","8,000円〜",""],["建具・建て付けの調整","5,000円〜",""],["棚・造作家具","20,000円〜",""],["間取りの変更","","現地を見てから"]],
+    quals:"建築大工技能士",
+    faq:[["介護保険は使えますか？","手すりや段差の解消は、住宅改修の対象になることがあります。ケアマネさんとの調整もお手伝いします。"],
+         ["図面がなくても相談できますか？","大丈夫です。お話を聞きながら、こちらで絵にします。"]],
+    voice:["棚のガタつき1つから相談に乗ってくれました。","仕事が早くて、あと片付けまできれいでした。"] },
+  sakan:{ em:"🧱", label:"左官・タイル", name:"いのうえ左官", tag:"壁は、手で塗るのがいちばんです。",
+    greeting:"左官の壁は、湿気にもにおいにも効きます。\nひび割れの補修から、塗り壁への替え、タイルの貼り替えまで。手仕事の壁の良さを知ってもらえたら嬉しいです。",
+    services:[["壁のひび補修","10,000円〜",""],["珪藻土・漆喰の塗り替え（1面）","25,000円〜",""],["タイルの貼り替え","15,000円〜",""],["土間・駐車場","","現地を見てから"]],
+    quals:"左官技能士",
+    faq:[["部分の補修だけでもいいですか？","はい。まわりと色を合わせて、目立たないように直します。"],
+         ["工期はどれくらいですか？","乾かす時間が要るので、広さにより2日からです。お急ぎの場合はご相談ください。"]],
+    voice:["補修した場所がどこか分からないです。","部屋のにおいが変わった気がします。"] },
+  gaikou:{ em:"🌿", label:"外構・お庭", name:"みどり造園", tag:"庭は、手を入れた分だけ応えます。",
+    greeting:"植木の剪定から、草木の始末、フェンス、駐車場まわりまで。庭の困りごとを受けています。\n1本の木の剪定でも、喜んで伺います。",
+    services:[["植木の剪定","5,000円〜/本",""],["草むしり・防草シート","15,000円〜",""],["フェンス・目隠し","","現地を見てから"],["砂利敷き","20,000円〜",""]],
+    quals:"造園技能士",
+    faq:[["切った枝の処分もお願いできますか？","はい、処分まで込みでお受けします。"],
+         ["毎年たのむと安くなりますか？","年間でお受けする場合は、まとめた金額をご提案します。"]],
+    voice:["お隣にかかっていた枝を、きれいにしてくれました。","庭が明るくなりました。"] },
+  souji:{ em:"✨", label:"ハウスクリーニング", name:"まつばらクリーニング", tag:"プロの道具は、やっぱり違います。",
+    greeting:"エアコンや換気扇の中は、家庭の道具では届きません。\n分解して、洗って、元に戻す。年に一度で、部屋の空気が変わります。",
+    services:[["エアコンの分解洗浄","12,000円〜",""],["換気扇・レンジフード","10,000円〜",""],["浴室まるごと","15,000円〜",""],["空室・引っ越し前後","","現地を見てから"]],
+    quals:"ハウスクリーニング技能士",
+    faq:[["作業時間はどれくらいですか？","エアコン1台で2時間ほどです。"],
+         ["立ち会いは必要ですか？","最初と最後だけ、確認をお願いしています。"]],
+    voice:["エアコンの風のにおいが消えました。","水まわりが新品みたいになりました。"] }
+};
+const BADGES = { mitsumori:"見積無料", kinkyu:"急ぎの対応OK", donichi:"土日もOK", chiiki:"地域密着" };
+const HERO_STYLES = { cover:{em:"🌄",label:"写真いっぱいに"}, split:{em:"🖼",label:"写真とならべて"}, simple:{em:"✍️",label:"文字で見せる"} };
+const MAIN_COLORS = ["#1d4e7e","#2e6e4e","#a03a3a","#6b4a2e","#33383d","#ce5f28","#2a7a80","#6b5aa0"];
+const ACCENT_COLORS = ["#1d4e7e","#2e6e4e","#a03a3a","#ce5f28","#d99a2b","#2a7a80"];
+const BG_TONES = { white:{label:"白", bg:"#ffffff", ink:"#22262a"}, warm:{label:"生成り", bg:"#faf6ef", ink:"#2b261f"}, dark:{label:"黒っぽく", bg:"#171b1f", ink:"#edeff1"} };
+const FONTS = {
+  gothic:{ label:"しっかり", head:'"Noto Sans JP"', body:'"Noto Sans JP"', gf:"Noto+Sans+JP:wght@400;500;700;900", hw:"900" },
+  mincho:{ label:"上品", head:'"Zen Old Mincho"', body:'"Noto Sans JP"', gf:"Zen+Old+Mincho:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700", hw:"700" },
+  maru:{ label:"やわらか", head:'"Zen Maru Gothic"', body:'"Zen Maru Gothic"', gf:"Zen+Maru+Gothic:wght@400;500;700;900", hw:"900" },
+  kaku:{ label:"ちからづよい", head:'"Zen Kaku Gothic New"', body:'"Zen Kaku Gothic New"', gf:"Zen+Kaku+Gothic+New:wght@400;500;700;900", hw:"900" }
+};
+const RADII = { kaku:{label:"かくかく", v:"3px"}, maru:{label:"すこし丸い", v:"12px"}, manmaru:{label:"まんまる", v:"22px"} };
+const SECTION_STYLES = { card:{label:"カードで"}, line:{label:"すっきり線で"} };
+const PARTS = {
+  greeting:"あいさつ文", services:"できること・料金", works:"仕事の写真",
+  flow:"たのみ方の流れ", voice:"お客さまの声", faq:"よくある質問",
+  area:"対応エリア", hours:"営業時間"
+};
+/* 公開の窓口。publish/README.md のとおりに設置して、ここにアドレスを入れる。
+   空のあいだは、ファイルを保存する形のままになる。 */
+let PUBLISH_API = "";
+const BRANCH = "main";
+const STORE_KEY = "nobobb.tsukuru.v2";
 
-const list = document.getElementById("list");
-const empty = document.getElementById("empty");
-const cats = document.getElementById("cats");
-const q = document.getElementById("q");
-let active = "すべて";
+/* ════════ いまの状態 ════════ */
+function preset(trade){
+  const t = TRADES[trade];
+  return {
+    trade, name:t.name, tag:t.tag, greeting:t.greeting,
+    services:t.services.map(s=>s.slice()), faq:t.faq.map(f=>f.slice()),
+    voice:t.voice.slice(), quals:t.quals,
+    flow:FLOW_DEFAULT.slice(),
+    phone:"", email:"", line:"",
+    badges:{ mitsumori:true, kinkyu:false, donichi:false, chiiki:true },
+    heroImg:null, works:[],
+    heroStyle:"cover", mainColor:"#1d4e7e", accentColor:null, bgTone:"white",
+    font:"gothic", radius:"maru", sectionStyle:"card",
+    parts:{ greeting:true, services:true, works:true, flow:true, voice:false, faq:true, area:true, hours:true },
+    area:"◯◯市とそのまわり（車で30分ほどの範囲）", hours:"8:00 〜 18:00", holiday:"日曜・祝日",
+    slug:"mysite", repo:"", pass:""
+  };
+}
+/* 読み込んだ保存データを、必ずこの形に整えてから使う */
+function sanitize(s){
+  const hex = c => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c);
+  const str = v => typeof v === "string" ? v : "";
+  const strArr = (v, w) => Array.isArray(v) && v.length
+    ? v.map(x => { const r = Array.isArray(x) ? x : []; return Array.from({length:w}, (_, i) => str(r[i])); })
+    : null;
+  const d = preset(s.trade);
+  if (!hex(s.mainColor)) s.mainColor = d.mainColor;
+  if (s.accentColor != null && !hex(s.accentColor)) s.accentColor = null;
+  if (!BG_TONES[s.bgTone]) s.bgTone = d.bgTone;
+  if (!FONTS[s.font]) s.font = d.font;
+  if (!RADII[s.radius]) s.radius = d.radius;
+  if (!SECTION_STYLES[s.sectionStyle]) s.sectionStyle = d.sectionStyle;
+  if (!HERO_STYLES[s.heroStyle]) s.heroStyle = d.heroStyle;
+  s.services = strArr(s.services, 3) || d.services;
+  s.faq = strArr(s.faq, 2) || d.faq;
+  s.voice = (Array.isArray(s.voice) ? s.voice.map(str) : d.voice).slice(0, 2);
+  s.flow = (Array.isArray(s.flow) ? s.flow.map(str) : d.flow).slice(0, 8);
+  ["name","tag","greeting","quals","phone","email","line","area","hours","holiday","slug","repo","pass"]
+    .forEach(k => { s[k] = str(s[k]); });
+  const bools = (v, keys, def) => { const o = {}; keys.forEach(k =>
+    { o[k] = (v && typeof v === "object" && k in v) ? !!v[k] : def[k]; }); return o; };
+  s.badges = bools(s.badges, Object.keys(BADGES), d.badges);
+  s.parts = bools(s.parts, Object.keys(PARTS), d.parts);
+  const okImg = v => typeof v === "string" && v.startsWith("data:image/");
+  if (!okImg(s.heroImg)) s.heroImg = null;
+  s.works = (Array.isArray(s.works) ? s.works : [])
+    .filter(w => w && okImg(w.img)).map(w => ({ img:w.img, cap:str(w.cap) })).slice(0, 8);
+  return s;
+}
+let S = preset("denki");
+try{
+  const saved = JSON.parse(localStorage.getItem(STORE_KEY));
+  if (saved && saved.trade && TRADES[saved.trade]) S = sanitize(Object.assign(preset(saved.trade), saved));
+}catch(e){}
 
-const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const block = (cls, label, arr) =>
-  `<div class="step ${cls}"><h3>${label}</h3><ul>${arr.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`;
-
-function render(){
-  const term = q.value.trim().toLowerCase();
-  const hits = ITEMS.filter(it =>
-    (active === "すべて" || it.cat === active) &&
-    (!term || (it.title + it.words + it.cat).toLowerCase().includes(term))
-  );
-  list.innerHTML = hits.map(it => `
-    <details class="card">
-      <summary>${it.urgent ? '<span class="tag">すぐ連絡</span>' : ""}<span>${esc(it.title)}</span></summary>
-      <div class="body">
-        ${block("do","まず、これをする", it.do)}
-        ${block("dont","やってはいけない", it.dont)}
-        ${block("call","業者を呼ぶ目安", it.call)}
-      </div>
-    </details>`).join("");
-  empty.hidden = hits.length > 0;
+/* ════════ 道具 ════════ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const nl = s => esc(s).replace(/\n/g,"<br>");
+const accent = () => S.accentColor || S.mainColor;
+/* 2色を自前で混ぜる（古い端末の color-mix 非対応でも崩れないように） */
+function hexMix(a, b, wa){
+  const ch = s => { const v = parseInt(s.slice(1), 16); return [v>>16 & 255, v>>8 & 255, v & 255]; };
+  const [r1,g1,b1] = ch(a), [r2,g2,b2] = ch(b);
+  const m = (x,y) => Math.round(x*wa + y*(1-wa));
+  return "#" + [m(r1,r2), m(g1,g2), m(b1,b2)].map(v => v.toString(16).padStart(2,"0")).join("");
+}
+/* 明るい色の上では黒文字、暗い色の上では白文字 */
+function onColor(hex){
+  const n = parseInt(hex.slice(1), 16);
+  const lum = 0.2126*(n>>16 & 255) + 0.7152*(n>>8 & 255) + 0.0722*(n & 255);
+  return lum > 150 ? "#20242a" : "#ffffff";
+}
+const cleanSlug = () => (S.slug.toLowerCase().replace(/[^a-z0-9-]/g,"-").replace(/-+/g,"-").replace(/^-|-$/g,"") || "mysite");
+function copyText(s){
+  return navigator.clipboard.writeText(s).catch(() => new Promise((res, rej) => {
+    const ta = document.createElement("textarea");
+    ta.value = s; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try{ ok = document.execCommand("copy"); }catch(e){}
+    ta.remove();
+    ok ? res() : rej(new Error("copy"));
+  }));
 }
 
-["すべて", ...new Set(ITEMS.map(i => i.cat))].forEach(c => {
+let saveTimer;
+function persist(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const dot = $("savedot");
+    try{
+      localStorage.setItem(STORE_KEY, JSON.stringify(S));
+      dot.textContent = "保存しました"; dot.classList.add("on");
+    }catch(e){
+      try{
+        localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign({}, S, {heroImg:null, works:[]})));
+        dot.textContent = "文章だけ保存（写真が多すぎます）"; dot.classList.add("on");
+      }catch(e2){ dot.textContent = "この端末では保存できません"; return; }
+    }
+    setTimeout(() => { dot.classList.remove("on"); dot.textContent = "自動保存"; }, 1800);
+  }, 500);
+}
+
+let paintTimer;
+function paint(now){
+  clearTimeout(paintTimer);
+  const go = () => {
+    $("pv").srcdoc = build();
+    const box = $("phonebox");
+    box.classList.remove("flash"); void box.offsetWidth; box.classList.add("flash");
+  };
+  if (now) go(); else paintTimer = setTimeout(go, 260);
+  persist();
+}
+
+/* ════════ できあがるホームページ ════════ */
+function build(){
+  const F = FONTS[S.font], B = BG_TONES[S.bgTone];
+  const dark = S.bgTone === "dark";
+  const main = dark ? "#e8edf2" : S.mainColor;
+  const acc = accent();
+  const accInk = onColor(acc);
+  const r = RADII[S.radius].v;
+  const name = esc(S.name.trim() || "（名前を入れてください）");
+  const tag = esc(S.tag.trim());
+  const telHref = S.phone.replace(/[^\d+]/g,"");
+  const hasTel = telHref.length >= 6;
+  const badges = Object.keys(BADGES).filter(k => S.badges[k]).map(k => `<span class="bdg">${BADGES[k]}</span>`).join("");
+  const P = S.parts;
+
+  /* いちばん上 */
+  const heroInner = `
+    ${badges ? `<p class="hero-badges">${badges}</p>` : ""}
+    <h1>${name}</h1>
+    ${tag ? `<p class="tagline">${tag}</p>` : ""}
+    ${hasTel ? `<a class="hero-tel" href="tel:${telHref}">☎ ${esc(S.phone)}</a>` : ""}`;
+  let hero;
+  if (S.heroStyle === "cover"){
+    const bgimg = S.heroImg
+      ? `background-image:linear-gradient(180deg, rgba(10,14,18,.25), rgba(10,14,18,.62)), url(${S.heroImg})`
+      : `background-image:linear-gradient(180deg, rgba(10,14,18,.16), rgba(10,14,18,.44)), linear-gradient(150deg, ${S.mainColor}, ${hexMix(S.mainColor, "#10151a", .55)})`;
+    hero = `<header class="hero cover" style="${bgimg}"><div class="hero-in">${heroInner}</div></header>`;
+  } else if (S.heroStyle === "split"){
+    hero = `<header class="hero split"><div class="hero-in">${heroInner}</div>
+      ${S.heroImg ? `<img class="hero-img" src="${S.heroImg}" alt="">` : ""}</header>`;
+  } else {
+    hero = `<header class="hero simple"><div class="hero-in">${heroInner}</div></header>`;
+  }
+
+  /* まんなか */
+  const secs = [];
+  const sec = (title, inner) => secs.push(`<section class="sec"><h2>${title}</h2>${inner}</section>`);
+
+  if (P.greeting && S.greeting.trim())
+    sec("ごあいさつ", `<p class="greet">${nl(S.greeting)}</p>`);
+
+  if (P.services && S.services.some(s => s[0].trim()))
+    sec("できること・料金", `<ul class="svc">${S.services.filter(s=>s[0].trim()).map(([t,p,d]) => `
+      <li><div class="svc-t">${esc(t)}${d.trim() ? `<small>${esc(d)}</small>` : ""}</div>
+      ${p.trim() ? `<div class="svc-p">${esc(p)}</div>` : (d.trim() ? "" : `<div class="svc-p soft">現地を見てから</div>`)}</li>`).join("")}</ul>
+      <p class="fine">料金は目安です。現場を見てから、正式なお見積りを出します。</p>`);
+
+  if (P.works && S.works.length)
+    sec("仕事の写真", `<div class="works">${S.works.map(w => `
+      <figure><img src="${w.img}" alt="${esc(w.cap)}" loading="lazy">${w.cap.trim() ? `<figcaption>${esc(w.cap)}</figcaption>` : ""}</figure>`).join("")}</div>`);
+
+  if (P.flow && S.flow.some(s => s.trim()))
+    sec("たのみ方の流れ", `<ol class="flow">${S.flow.filter(s=>s.trim()).map(s => `<li>${esc(s)}</li>`).join("")}</ol>`);
+
+  if (P.voice && S.voice.some(v => v.trim()))
+    sec("お客さまの声", S.voice.filter(v=>v.trim()).map(v => `<blockquote class="voice">${nl(v)}<span>— お客さま</span></blockquote>`).join(""));
+
+  if (P.faq && S.faq.some(f => f[0].trim()))
+    sec("よくある質問", S.faq.filter(f=>f[0].trim()).map(([q,a]) => `
+      <div class="qa"><p class="q">${esc(q)}</p><p class="a">${nl(a)}</p></div>`).join(""));
+
+  if (P.area && S.area.trim())
+    sec("対応エリア", `<p class="plain">${nl(S.area)}<br><small class="soft2">エリア外でも、まずはご相談ください。</small></p>`);
+
+  if (P.hours && S.hours.trim())
+    sec("営業時間", `<p class="plain">${esc(S.hours)}${S.holiday.trim() ? `<br><small class="soft2">お休み：${esc(S.holiday)}</small>` : ""}</p>`);
+
+  /* 連絡先 */
+  const contactRows = [];
+  if (hasTel) contactRows.push(`<a class="c-tel" href="tel:${telHref}">☎ ${esc(S.phone)}</a>
+    <p class="fine">「ホームページを見た」と言っていただけると助かります。</p>`);
+  else if (S.phone.trim()) contactRows.push(`<p class="c-line">電話：<b>${esc(S.phone)}</b></p>`);
+  if (S.email) contactRows.push(`<a class="c-btn" href="mailto:${esc(S.email)}">✉ メールで相談する</a>`);
+  if (S.line) contactRows.push(`<p class="c-line">LINE：<b>${esc(S.line)}</b> で検索してください</p>`);
+  if (contactRows.length)
+    secs.push(`<section class="sec contact"><h2>お問い合わせ</h2>${contactRows.join("")}</section>`);
+
+  const quals = S.quals.trim() ? `<p class="quals">${esc(S.quals)}</p>` : "";
+  const stickybar = hasTel ? `<div class="callbar">
+    <a class="cb-tel" href="tel:${telHref}">☎ 電話する</a>
+    ${S.email ? `<a class="cb-mail" href="mailto:${esc(S.email)}" aria-label="メール">✉</a>` : ""}</div>` : "";
+
+  const isCard = S.sectionStyle === "card";
+  const soft = dark ? hexMix(acc, B.bg, .16) : hexMix(S.mainColor, B.bg, .07);
+  const lineC = dark ? "rgba(255,255,255,.14)" : hexMix(B.ink, B.bg, .14);
+
+  return `<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${name}${tag ? "｜" + tag : ""}</title>
+<meta name="description" content="${tag || name}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${F.gf}&display=swap">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:${B.bg}; color:${B.ink};
+  font-family:${F.body},"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+  font-size:16px; line-height:1.95; letter-spacing:.02em; -webkit-font-smoothing:antialiased;
+  ${hasTel ? "padding-bottom:74px;" : ""}}
+h1,h2{font-family:${F.head},"Hiragino Sans",serif; line-height:1.4; letter-spacing:.03em}
+.page{max-width:720px; margin:0 auto}
+main{padding:0 22px}
+
+.hero .hero-in{padding:0 22px}
+.hero h1{font-size:clamp(1.9rem, 7.5vw, 2.7rem); font-weight:${F.hw}; margin:8px 0 6px}
+.tagline{margin:0; font-size:1.02rem}
+.hero-badges{margin:0; display:flex; flex-wrap:wrap; gap:7px}
+.bdg{font-size:.72rem; font-weight:700; padding:3px 11px; border-radius:999px}
+.hero-tel{display:inline-block; margin-top:18px; font-size:1.05rem; font-weight:700; text-decoration:none;
+  padding:11px 22px; border-radius:${r}; background:${acc}; color:${accInk}}
+.hero.cover{background-size:cover; background-position:center; color:#fff;
+  min-height:400px; display:flex; align-items:flex-end}
+.hero.cover .hero-in{padding:110px 26px 42px; width:100%}
+.hero.cover .tagline{color:rgba(255,255,255,.9)}
+.hero.cover .bdg{background:rgba(255,255,255,.18); color:#fff}
+.hero.split{padding:56px 0 0}
+.hero.split .tagline{color:${dark ? acc : S.mainColor}}
+.hero.split .bdg{background:${soft}; color:${main}}
+.hero-img{display:block; width:calc(100% - 44px); margin:26px auto 0; border-radius:${r};
+  aspect-ratio:16/10; object-fit:cover}
+.hero.simple{padding:84px 0 44px; border-bottom:1px solid ${lineC}}
+.hero.simple .hero-in{text-align:center}
+.hero.simple h1{font-size:clamp(2.1rem, 8.5vw, 3rem)}
+.hero.simple .tagline{color:${dark ? acc : S.mainColor}}
+.hero.simple .hero-badges{justify-content:center}
+.hero.simple .bdg{background:${soft}; color:${main}}
+
+.sec{margin-top:74px}
+.sec h2{font-size:1.32rem; margin:0 0 26px; color:${main}}
+${isCard
+  ? `.sec h2{text-align:center}
+.sec h2::after{content:""; display:block; width:34px; height:4px; border-radius:2px; background:${acc}; margin:12px auto 0}`
+  : `.sec h2{padding-left:14px; border-left:5px solid ${acc}}`}
+.greet{margin:0; font-size:1.02rem}
+.plain{margin:0; font-size:1.02rem}
+.soft2{opacity:.62}
+.fine{margin:14px 0 0; font-size:.8rem; opacity:.62}
+
+.svc{list-style:none; margin:0; padding:0; display:grid; gap:${isCard ? "12px" : "0"}}
+.svc li{display:flex; gap:14px; align-items:center;
+  ${isCard ? `background:${soft}; border-radius:${r}; padding:16px 18px;` : `padding:15px 4px; border-bottom:1px solid ${lineC};`}}
+.svc-t{font-weight:700}
+.svc-t small{display:block; font-weight:400; font-size:.8rem; opacity:.68; margin-top:1px}
+.svc-p{margin-left:auto; font-weight:700; color:${dark ? acc : S.mainColor}; white-space:nowrap}
+.svc-p.soft{font-weight:400; font-size:.85rem; opacity:.7; color:inherit}
+
+.works{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.works figure{margin:0}
+.works img{width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:${r}; display:block}
+.works figcaption{font-size:.82rem; margin-top:7px; opacity:.8}
+
+.flow{list-style:none; margin:0; padding:0; counter-reset:n}
+.flow li{counter-increment:n; position:relative; padding:2px 0 26px 52px; font-size:1rem}
+.flow li::before{content:counter(n); position:absolute; left:0; top:0;
+  width:34px; height:34px; border-radius:50%; background:${acc}; color:${accInk};
+  font-weight:700; display:grid; place-items:center; font-size:.95rem}
+.flow li:not(:last-child)::after{content:""; position:absolute; left:16px; top:38px; bottom:2px; width:2px; background:${lineC}}
+.flow li:last-child{padding-bottom:0}
+
+.voice{margin:0 0 14px; padding:18px 20px; border-radius:${r};
+  ${isCard ? `background:${soft};` : `border:1px solid ${lineC};`} font-size:.98rem}
+.voice span{display:block; margin-top:8px; font-size:.78rem; opacity:.6}
+
+.qa{margin-bottom:22px}
+.qa .q{margin:0 0 6px; font-weight:700; padding-left:30px; position:relative}
+.qa .q::before{content:"Q"; position:absolute; left:0; top:1px; color:${dark ? acc : S.mainColor}; font-weight:900}
+.qa .a{margin:0; padding-left:30px; font-size:.97rem; opacity:.92}
+
+.contact{${isCard ? `background:${soft}; border-radius:${r}; padding:34px 24px 30px; text-align:center;` : `border-top:1px solid ${lineC}; padding-top:44px; text-align:center;`}}
+.contact h2{margin-bottom:18px}
+.c-tel{display:block; font-size:1.7rem; font-weight:900; color:${dark ? "#fff" : S.mainColor}; text-decoration:none; letter-spacing:.03em}
+.c-btn{display:inline-block; margin-top:16px; padding:13px 30px; border-radius:${r};
+  background:${acc}; color:${accInk}; text-decoration:none; font-weight:700; font-size:.95rem}
+.c-line{margin:16px 0 0; font-size:.92rem}
+
+footer{margin-top:70px; padding:26px 22px 34px; text-align:center; font-size:.78rem; opacity:.62;
+  border-top:1px solid ${lineC}}
+.quals{margin:0 0 6px}
+footer p{margin:0}
+
+.callbar{position:fixed; left:0; right:0; bottom:0; display:flex; gap:10px;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  background:${dark ? "rgba(23,27,31,.92)" : "rgba(255,255,255,.94)"}; backdrop-filter:blur(8px);
+  border-top:1px solid ${lineC}}
+.cb-tel{flex:1; text-align:center; padding:13px; border-radius:${r}; background:${acc};
+  color:${accInk}; font-weight:700; text-decoration:none}
+.cb-mail{flex:none; width:52px; display:grid; place-items:center; border-radius:${r};
+  border:2px solid ${acc}; color:${dark ? "#fff" : acc}; text-decoration:none; font-size:1.1rem}
+@media (min-width:760px){.callbar{display:none} body{padding-bottom:0}}
+</style></head>
+<body><div class="page">
+${hero}
+<main>
+${secs.join("\n")}
+</main>
+<footer>${quals}<p>© ${name}</p></footer>
+${stickybar}
+</div></body></html>`;
+}
+
+/* ════════ えらぶ部品 ════════ */
+function pickGroup(boxId, data, get, set){
+  const box = $(boxId);
+  box.innerHTML = "";
+  Object.entries(data).forEach(([id, o]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "opt";
+    b.innerHTML = (o.em ? `<span class="em">${o.em}</span>` : "") + o.label;
+    b.setAttribute("aria-pressed", String(get() === id));
+    b.addEventListener("click", () => {
+      set(id);
+      [...box.children].forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+      paint();
+    });
+    box.appendChild(b);
+  });
+}
+function colorGroup(boxId, colors, get, set, withAuto){
+  const box = $(boxId);
+  box.innerHTML = "";
+  const refresh = () => {
+    [...box.children].forEach(x => {
+      if (x.type === "color") return;
+      const mine = x.classList.contains("auto") ? null : x.dataset.c;
+      x.setAttribute("aria-pressed", String(mine === (get() ?? null)));
+    });
+  };
+  if (withAuto){
+    const a = document.createElement("button");
+    a.type = "button"; a.className = "sw auto"; a.textContent = "おまかせ";
+    a.addEventListener("click", () => { set(null); refresh(); paint(); });
+    box.appendChild(a);
+  }
+  colors.forEach(c => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "sw"; b.style.background = c; b.dataset.c = c;
+    b.setAttribute("aria-label", "色 " + c);
+    b.addEventListener("click", () => { set(c); refresh(); paint(); });
+    box.appendChild(b);
+  });
+  const custom = document.createElement("input");
+  custom.type = "color";
+  if (custom.type !== "color"){ refresh(); return; }
+  custom.value = (get() && !colors.includes(get())) ? get() : "#888888";
+  custom.setAttribute("aria-label", "すきな色をえらぶ");
+  custom.addEventListener("input", () => { set(custom.value); refresh(); paint(); });
+  box.appendChild(custom);
+  refresh();
+}
+
+/* しごとの種類（見本の入れ替えは、書き換えていない欄だけ） */
+function switchTrade(next){
+  const oldP = TRADES[S.trade], newP = TRADES[next];
+  const same = (a,b) => JSON.stringify(a) === JSON.stringify(b);
+  if (S.name === oldP.name) S.name = newP.name;
+  if (S.tag === oldP.tag) S.tag = newP.tag;
+  if (S.greeting === oldP.greeting) S.greeting = newP.greeting;
+  if (S.quals === oldP.quals) S.quals = newP.quals;
+  if (same(S.services, oldP.services)) S.services = newP.services.map(s=>s.slice());
+  if (same(S.faq, oldP.faq)) S.faq = newP.faq.map(f=>f.slice());
+  if (same(S.voice, oldP.voice)) S.voice = newP.voice.slice();
+  S.trade = next;
+  syncInputs();
+}
+
+/* 入力欄 ⇔ 状態 */
+const FIELDS = [
+  ["f-name","name"],["f-tag","tag"],["f-phone","phone"],["f-email","email"],["f-line","line"],
+  ["f-greeting","greeting"],["f-area","area"],["f-hours","hours"],["f-holiday","holiday"],["f-quals","quals"]
+];
+FIELDS.forEach(([id,key]) => $(id).addEventListener("input", e => { S[key] = e.target.value; paint(); }));
+[0,1].forEach(i => $("f-voice"+i).addEventListener("input", e => { S.voice[i] = e.target.value; paint(); }));
+
+function syncInputs(){
+  FIELDS.forEach(([id,key]) => { $(id).value = S[key]; });
+  [0,1].forEach(i => { $("f-voice"+i).value = S.voice[i] || ""; });
+  $("slug").value = S.slug;
+  $("repo").value = S.repo;
+  $("pass").value = S.pass;
+  renderSvc(); renderFlow(); renderFaq(); renderHero(); renderWorks();
+  renderToggleGroup("badges", BADGES, S.badges);
+  renderToggleGroup("parts", PARTS, S.parts, refreshPartPanels);
+  refreshPartPanels();
+}
+
+function renderToggleGroup(boxId, labels, state, extra){
+  const box = $(boxId);
+  box.innerHTML = "";
+  Object.entries(labels).forEach(([k, label]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "opt";
+    b.textContent = label;
+    b.setAttribute("aria-pressed", String(!!state[k]));
+    b.addEventListener("click", () => {
+      state[k] = !state[k];
+      b.setAttribute("aria-pressed", String(state[k]));
+      if (extra) extra();
+      paint();
+    });
+    box.appendChild(b);
+  });
+}
+function refreshPartPanels(){
+  document.querySelectorAll("[data-part]").forEach(el => {
+    el.style.display = S.parts[el.dataset.part] ? "" : "none";
+  });
+}
+
+/* できること */
+function renderSvc(){
+  const box = $("svcRows");
+  box.innerHTML = "";
+  S.services.forEach((s, i) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `
+      <div class="rline"><input data-k="0" placeholder="仕事の名前" value="${esc(s[0])}">
+        <button class="del" type="button" aria-label="この行を消す">✕</button></div>
+      <div class="rline"><input data-k="1" placeholder="料金（例：8,000円〜）" value="${esc(s[1])}">
+        <input data-k="2" placeholder="ひとこと（なくてもOK）" value="${esc(s[2])}"></div>`;
+    row.querySelectorAll("input").forEach(inp =>
+      inp.addEventListener("input", () => { s[Number(inp.dataset.k)] = inp.value; paint(); }));
+    row.querySelector(".del").addEventListener("click", () => { S.services.splice(i,1); renderSvc(); paint(); });
+    box.appendChild(row);
+  });
+}
+$("svcAdd").addEventListener("click", () => {
+  S.services.push(["","",""]); renderSvc(); paint();
+  const last = $("svcRows").lastElementChild;
+  if (last) last.querySelector("input").focus();
+});
+
+/* 流れ */
+function renderFlow(){
+  const box = $("flowRows");
+  box.innerHTML = "";
+  S.flow.forEach((s, i) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<div class="rline"><input value="${esc(s)}" placeholder="（空なら載りません）"></div>`;
+    row.querySelector("input").addEventListener("input", e => { S.flow[i] = e.target.value; paint(); });
+    box.appendChild(row);
+  });
+}
+
+/* 質問 */
+function renderFaq(){
+  const box = $("faqBox");
+  box.innerHTML = "";
+  S.faq.forEach((f, i) => {
+    const wrap = document.createElement("div");
+    wrap.innerHTML = `
+      <label class="field">質問 ${i+1}<input></label>
+      <label class="field">答え<textarea style="min-height:60px"></textarea></label>`;
+    const q = wrap.querySelector("input"), a = wrap.querySelector("textarea");
+    q.value = f[0]; a.value = f[1];
+    q.addEventListener("input", () => { f[0] = q.value; paint(); });
+    a.addEventListener("input", () => { f[1] = a.value; paint(); });
+    box.appendChild(wrap);
+  });
+}
+
+/* ════════ 写真 ════════ */
+function shrink(file, maxW, q){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxW / img.naturalWidth, 2200 / img.naturalHeight);
+      const c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(img.naturalWidth * scale));
+      c.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      const out = c.toDataURL("image/jpeg", q);
+      if (out.length < 100) { rej(new Error("encode")); return; }
+      res(out);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("read")); };
+    img.src = url;
+  });
+}
+function renderHero(){
+  const box = $("heroRow");
+  box.innerHTML = "";
+  $("heroPick").textContent = S.heroImg ? "↺ 写真をえらび直す" : "＋ 写真をえらぶ";
+  if (!S.heroImg) return;
+  const row = document.createElement("div");
+  row.className = "row";
+  row.innerHTML = `<div class="rline"><img src="${S.heroImg}" alt="いちばん上の写真">
+    <span style="flex:1; font-size:.85rem; color:var(--muted)">入っています</span>
+    <button class="del" type="button" aria-label="写真を消す">✕</button></div>`;
+  row.querySelector(".del").addEventListener("click", () => { S.heroImg = null; renderHero(); paint(); });
+  box.appendChild(row);
+}
+$("heroPick").addEventListener("click", () => $("heroFile").click());
+$("heroFile").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try{ S.heroImg = await shrink(f, 1400, .8); renderHero(); paint(); }
+  catch(err){ alert("この写真は読み込めませんでした。別の写真でためしてください。"); }
+});
+function renderWorks(){
+  const box = $("workRows");
+  box.innerHTML = "";
+  S.works.forEach((w, i) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<div class="rline"><img src="${w.img}" alt="">
+      <input placeholder="ひとこと（例：施工後のリビング）">
+      <button class="del" type="button" aria-label="この写真を消す">✕</button></div>`;
+    const cap = row.querySelector("input");
+    cap.value = w.cap;
+    cap.addEventListener("input", () => { w.cap = cap.value; paint(); });
+    row.querySelector(".del").addEventListener("click", () => { S.works.splice(i,1); renderWorks(); paint(); });
+    box.appendChild(row);
+  });
+  $("workPick").style.display = S.works.length >= 8 ? "none" : "";
+}
+$("workPick").addEventListener("click", () => $("workFile").click());
+$("workFile").addEventListener("change", async e => {
+  const files = [...e.target.files].slice(0, Math.max(0, 8 - S.works.length));
+  e.target.value = "";
+  for (const f of files){
+    try{ S.works.push({ img: await shrink(f, 1000, .76), cap:"" }); }
+    catch(err){ alert("読み込めない写真がありました。"); }
+  }
+  renderWorks(); paint();
+});
+
+/* ════════ タブ ════════ */
+const TABS = [["mise","🏪","おみせ"],["photo","📷","しゃしん"],["design","🎨","デザイン"],["naiyou","📋","のせるもの"],["open","🌐","公開"]];
+const tabbar = $("tabs");
+TABS.forEach(([id, em, label], i) => {
   const b = document.createElement("button");
   b.type = "button";
-  b.textContent = c;
-  b.setAttribute("aria-pressed", String(c === active));
+  b.innerHTML = `<span class="em">${em}</span>${label}`;
+  b.setAttribute("aria-selected", String(i === 0));
   b.addEventListener("click", () => {
-    active = c;
-    [...cats.children].forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-    render();
+    [...tabbar.children].forEach(x => x.setAttribute("aria-selected", String(x === b)));
+    document.querySelectorAll(".panel").forEach(p => p.classList.toggle("on", p.dataset.tab === id));
+    window.scrollTo({ top: 0 });
   });
-  cats.appendChild(b);
+  tabbar.appendChild(b);
+});
+document.querySelector('.panel[data-tab="mise"]').classList.add("on");
+
+/* ════════ 公開 ════════ */
+function say(id, s){
+  const el = $(id);
+  el.textContent = s;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.textContent = ""; }, 3200);
+}
+const cleanRepo = () => S.repo.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\.git$/, "").replace(/\/+$/, "");
+const repoOk = () => /^[\w.-]+\/[\w.-]+$/.test(cleanRepo());
+function showUrl(){
+  if (!repoOk()){
+    $("puburl").textContent = "置き場所を入れると、ここにアドレスが出ます";
+    return;
+  }
+  const [owner, repo] = cleanRepo().split("/");
+  $("puburl").textContent = `https://${owner}.github.io/${repo}/${cleanSlug()}.html`;
+}
+$("slug").addEventListener("input", e => { S.slug = e.target.value; showUrl(); persist(); });
+$("repo").addEventListener("input", e => { S.repo = e.target.value; showUrl(); persist(); });
+
+function download(){
+  const file = cleanSlug() + ".html";
+  const blob = new Blob([build()], { type:"text/html;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = file;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  return file;
+}
+$("dl").addEventListener("click", () => {
+  const file = download();
+  $("doneFile").textContent = file;
+  $("done").className = "done on";
 });
 
-q.addEventListener("input", render);
-render();
+$("pub").addEventListener("click", () => {
+  const steps = $("pubsteps");
+  if (!repoOk()){
+    steps.className = "steps on";
+    steps.innerHTML = `<b>置き場所を入れてください。</b>
+      <p style="margin:6px 0 0">GitHub のアドレスが <code>github.com/yamada/homepage</code> なら、
+      <b>yamada/homepage</b> と入れます。</p>`;
+    return;
+  }
+  window.open(`https://github.com/${cleanRepo()}/upload/${BRANCH}`, "_blank", "noopener");
+  steps.className = "steps on";
+  steps.innerHTML = `<b>ひらいた GitHub の画面で：</b><ol>
+    <li>「choose your files」を押す</li>
+    <li>上で保存した <b>${esc(cleanSlug() + ".html")}</b> をえらぶ</li>
+    <li>下までスクロールして、緑の「Commit changes」を押す</li>
+    <li>1〜2分待ってから、上のアドレスをひらく</li></ol>
+    <p style="margin:8px 0 0">まだ保存していない場合は、いちばん上の「ホームページを保存する」を先に押してください。</p>`;
+  say("pubmsg", "GitHub をひらきました");
+});
 
-// 連絡先メモ（この端末の中だけに残ります）
-const saved = document.getElementById("saved");
-let timer;
-["c1","c2","c3","c4"].forEach(id => {
-  const el = document.getElementById(id);
-  try { el.value = localStorage.getItem("nobobb." + id) || ""; } catch (e) {}
-  el.addEventListener("input", () => {
-    try {
-      localStorage.setItem("nobobb." + id, el.value);
-      saved.textContent = "保存しました";
-      clearTimeout(timer);
-      timer = setTimeout(() => { saved.textContent = ""; }, 2000);
-    } catch (e) {
-      saved.textContent = "この端末では保存できません";
+/* ── ネットに出す（窓口ぜんぶ経由） ── */
+const autoOn = () => /^https?:\/\/\S+$/.test(PUBLISH_API);
+$("pass").addEventListener("input", e => { S.pass = e.target.value; persist(); });
+
+async function publish(){
+  const btn = $("go");
+  const slug = cleanSlug();
+  if (!S.pass.trim()){ say("gomsg", "合言葉を入れてください"); return; }
+  btn.disabled = true;
+  const label = btn.textContent;
+  btn.textContent = "出しています…";
+  say("gomsg", "");
+  try{
+    const res = await fetch(PUBLISH_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pass: S.pass, slug, html: build() }),
+    });
+    let data = {};
+    try{ data = await res.json(); }catch(e){}
+    if (!res.ok || !data.url){
+      say("gomsg", data.error || "うまくいきませんでした。少し待ってもう一度おためしください。");
+      return;
     }
-  });
+    $("liveUrl").textContent = data.url;
+    $("openUrl").href = data.url;
+    $("live").className = "done on";
+    say("gomsg", data.updated ? "新しいものに入れ替えました" : "はじめて出しました");
+    $("live").scrollIntoView({ behavior:"smooth", block:"nearest" });
+  }catch(e){
+    say("gomsg", "つながりませんでした。電波を確かめて、もう一度おためしください。");
+  }finally{
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+}
+$("go").addEventListener("click", publish);
+function lineShare(url){
+  const name = S.name.trim();
+  const msg = (name ? name + "のホームページができました。\n" : "ホームページができました。\n") + url;
+  window.open("https://line.me/R/share?text=" + encodeURIComponent(msg), "_blank", "noopener");
+}
+$("lineShare").addEventListener("click", () => lineShare($("liveUrl").textContent));
+$("lineShare2").addEventListener("click", () => lineShare($("puburl").textContent));
+$("otherShare").addEventListener("click", () => {
+  const url = $("liveUrl").textContent;
+  if (navigator.share) navigator.share({ text: S.name.trim() + "のホームページ", url }).catch(() => {});
 });
+if (!navigator.share) $("otherShare").hidden = true;
+$("copyUrl").addEventListener("click", async () => {
+  try{ await copyText($("liveUrl").textContent); say("gomsg", "アドレスをコピーしました"); }
+  catch(e){ say("gomsg", "コピーできませんでした。長押しで選んでコピーしてください"); }
+});
+
+/* ════════ とっておく ════════ */
+$("exportBtn").addEventListener("click", async () => {
+  const lite = Object.assign({}, S, { heroImg:null, works:[] });
+  const code = btoa(unescape(encodeURIComponent(JSON.stringify(lite))));
+  try{ await copyText(code); say("savemsg", "保存コードをコピーしました"); }
+  catch(e){ prompt("この文字列を控えてください", code); }
+});
+$("importBtn").addEventListener("click", () => {
+  const code = prompt("保存コードを貼り付けてください");
+  if (!code) return;
+  try{
+    const data = JSON.parse(decodeURIComponent(escape(atob(code.replace(/\s+/g, "")))));
+    if (!data.trade || !TRADES[data.trade]) throw new Error("bad");
+    S = sanitize(Object.assign(preset(data.trade), data));
+    syncInputs(); buildPickers(); showUrl(); paint();
+    say("savemsg", "読み込みました");
+  }catch(e){ say("savemsg", "そのコードは読み込めませんでした"); }
+});
+$("resetBtn").addEventListener("click", () => {
+  if (!confirm("書いたもの・写真をぜんぶ消して、はじめからにします。いいですか？")) return;
+  try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+  S = preset("denki");
+  syncInputs(); buildPickers(); showUrl(); paint();
+});
+
+/* ════════ はじめの一回 ════════ */
+function buildPickers(){
+  pickGroup("trade", TRADES, () => S.trade, switchTrade);
+  pickGroup("heroStyle", HERO_STYLES, () => S.heroStyle, v => S.heroStyle = v);
+  pickGroup("bgTone", BG_TONES, () => S.bgTone, v => S.bgTone = v);
+  pickGroup("font", FONTS, () => S.font, v => S.font = v);
+  pickGroup("radius", RADII, () => S.radius, v => S.radius = v);
+  pickGroup("sectionStyle", SECTION_STYLES, () => S.sectionStyle, v => S.sectionStyle = v);
+  colorGroup("mainColors", MAIN_COLORS, () => S.mainColor, v => S.mainColor = v, false);
+  colorGroup("accentColors", ACCENT_COLORS, () => S.accentColor, v => S.accentColor = v, true);
+}
+function setupPublish(){
+  const on = autoOn();
+  $("autoBox").hidden = !on;
+  $("manualBox").hidden = false;          // 保存はいつでも残す
+  $("ghFold").hidden = on;
+  if (on){
+    $("dl").className = "btn ghost";
+    $("dl").textContent = "ファイルとしても保存する";
+    $("shareStep").querySelector(".hint").innerHTML =
+      "「ネットに出す」のあとに出る<b>「LINE で送る」</b>を押すと、" +
+      "アドレスの入った LINE がひらきます。あとは<b>相手をえらんで送信を押すだけ</b>です。" +
+      "メールなら、保存したファイルをそのまま添付して送ることもできます。";
+  }
+}
+buildPickers();
+syncInputs();
+setupPublish();
+showUrl();
+paint(true);
 </script>
 </body>
 </html>
