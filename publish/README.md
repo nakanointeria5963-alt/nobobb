@@ -55,7 +55,7 @@ Worker の画面 → **Settings** → **Variables and Secrets** → **Add**
 | `GH_TOKEN` | **Secret** | 手順1でコピーした鍵 |
 | `REPO` | Text | `roguepink/nobobb` |
 | `PASS` | **Secret** | 好きな合言葉（例：`nakano2026`） |
-| `ALLOW_ORIGIN` | Text | `https://roguepink.github.io` |
+| `ALLOW_ORIGIN` | Text | `https://tsukuru.roguepink.com` |
 
 `GH_TOKEN` と `PASS` は必ず **Secret**（かくす）にしてください。
 
@@ -90,7 +90,7 @@ https://＜なにか＞.＜あなたの名前＞.workers.dev
 ## 公開されるアドレス
 
 ```
-https://roguepink.github.io/nobobb/sites/＜ページの名前＞.html
+https://tsukuru.roguepink.com/sites/＜ページの名前＞.html
 ```
 
 置いたあと、`main` から公開用に写す処理が走るので、**見られるようになるまで1〜2分**かかります。
