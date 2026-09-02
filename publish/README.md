@@ -35,13 +35,13 @@
 お客さんが作ったページを置く場所を、**新しく1つ**作ります。アプリのコードと混ぜないためです。
 
 1. GitHub → 右上の **＋** → **New repository**
-2. **Repository name**: `mise`（お店、の意味。なんでもいい）
+2. **Repository name**: `omise`（実際に作ったのはこの名前。ノブさんの置き場所）
 3. **Public** のまま
 4. **Add a README file** にチェック（空だと Pages が有効にできません）
 5. **Create repository**
 6. できたら **Settings** → **Pages** → **Source** を `Deploy from a branch`、Branch を `main` / `/ (root)` にして **Save**
 
-独自ドメインにしたいときは、同じ **Pages** の画面で **Custom domain** に `mise.roguepink.com` を入れます。**先に Vercel の DNS に1行足しておいてください**（Name `mise`、Type `CNAME`、Value `roguepink.github.io`）。
+独自ドメインにしたいときは、同じ **Pages** の画面で **Custom domain** に `omise.roguepink.com` を入れます。**先に Vercel の DNS に1行足しておいてください**（Name `omise`、Type `CNAME`、Value `roguepink.github.io`）。
 
 ### 1. GitHub の鍵をつくる
 
@@ -51,7 +51,7 @@
 4. 次のように決めます
    - **Token name**: `tsukuru-publisher`（なんでもいい）
    - **Expiration**: **1年**（無期限にしない。漏れたときに永久に使えてしまうため）
-   - **Repository access**: **Only select repositories** → 手順0で作った `mise` **だけ**をえらぶ
+   - **Repository access**: **Only select repositories** → 手順0で作った `omise` **だけ**をえらぶ
    - **Permissions** → **Repository permissions** → **Contents** を **Read and write** に
 5. **Generate token** を押す
 6. **出てきた文字列をコピーする。この画面を閉じると二度と見られません。**
@@ -73,10 +73,10 @@ Worker の画面 → **Settings** → **Variables and Secrets** → **Add**
 | 名前 | 種類 | 中身 |
 |---|---|---|
 | `GH_TOKEN` | **Secret** | 手順1でコピーした鍵 |
-| `REPO` | Text | `roguepink/mise` |
+| `REPO` | Text | `roguepink/omise` |
 | `PASS` | **Secret** | 好きな合言葉（例：`nakano2026`） |
 | `ALLOW_ORIGIN` | Text | `https://tsukuru.roguepink.com` |
-| `PUBLIC_BASE` | Text | `https://mise.roguepink.com`（独自ドメインを使うとき） |
+| `PUBLIC_BASE` | Text | `https://omise.roguepink.com`（独自ドメインを使うとき） |
 
 `GH_TOKEN` と `PASS` は必ず **Secret**（かくす）にしてください。
 
@@ -112,7 +112,7 @@ https://＜なにか＞.＜あなたの名前＞.workers.dev
 ## 公開されるアドレス
 
 ```
-https://mise.roguepink.com/sites/＜ページの名前＞.html
+https://omise.roguepink.com/sites/＜ページの名前＞.html
 ```
 
 置いたあと、公開の処理が走るので、**見られるようになるまで1〜2分**かかります。
@@ -146,4 +146,4 @@ https://mise.roguepink.com/sites/＜ページの名前＞.html
 | 置けませんでした / 消せませんでした（401 / 403） | 鍵の期限切れ、または置き場所への権限がない |
 | 置けませんでした（404） | `REPO` の綴りちがい |
 | 何も起きない・つながらない | `ALLOW_ORIGIN` がアプリのアドレスと一致しているか |
-| 出したのにページが見つからない | `mise` の **Settings → Pages** が有効になっているか。1〜2分待ったか |
+| 出したのにページが見つからない | `omise` の **Settings → Pages** が有効になっているか。1〜2分待ったか |
