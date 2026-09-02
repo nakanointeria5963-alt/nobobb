@@ -1,11 +1,14 @@
 /*
- * ホームページを受け取って、GitHub に置いて、アドレスを返すだけの窓口。
+ * ホームページを受け取って、GitHub に置いて、アドレスを返す窓口。
+ * 出したページを、あとから消すこともできます。
  *
  * これは Cloudflare Workers で動かします。設置のしかたは、
  * となりの README.md に書いてあります。
  *
  * GitHub の鍵（トークン）は、この窓口の中だけにあります。
  * アプリ側には持たせません。
+ *
+ * ★ 出すのも消すのも、同じ合言葉です。覚えるものを増やさないため。
  */
 
 export default {
@@ -30,26 +33,18 @@ export default {
     let body;
     try { body = await req.json(); }
     catch { return say({ error: "受け取れませんでした。もう一度おためしください。" }, 400, cors); }
+    const action = String(body?.action ?? "publish");
     const pass = String(body?.pass ?? "");
     const slug = String(body?.slug ?? "");
-    const html = body?.html;
 
-    // 合言葉
-    if (!same(pass, env.PASS))
+    // 合言葉。出すときも消すときも、ここを通る
+    if (!same(pass, String(env.PASS)))
       return say({ error: "合言葉がちがいます。" }, 401, cors);
 
     // ページの名前
     if (!/^[a-z0-9][a-z0-9-]{0,39}$/.test(slug))
       return say({ error: "ページの名前は、英字の小文字・数字・ハイフンだけにしてください。" }, 400, cors);
 
-    // 中身
-    if (typeof html !== "string" || html.length < 50)
-      return say({ error: "ホームページの中身がありませんでした。" }, 400, cors);
-    const MAX = Number(env.MAX_BYTES || 6 * 1024 * 1024);
-    if (html.length > MAX)
-      return say({ error: "写真が多すぎます。枚数を減らすか、小さめの写真にしてください。" }, 413, cors);
-
-    // GitHub へ
     const path = `${dir}/${slug}.html`;
     const api = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(path)}`;
     const head = {
@@ -60,18 +55,46 @@ export default {
       "Content-Type": "application/json",
     };
 
-    // すでに同じ名前があるなら、上書きのために目印（sha）が要る
+    // いま置いてあるか調べる。上書きにも、消すにも、目印(sha)が要る
     let sha;
     const now = await fetch(`${api}?ref=${encodeURIComponent(branch)}`, { headers: head });
     if (now.status === 200) sha = (await now.json()).sha;
     else if (now.status !== 404) return say({ error: "GitHub につながりませんでした。" }, 502, cors);
+
+    /* ───────── 消す ───────── */
+    if (action === "delete") {
+      // もう無いなら、消えている状態は同じ。エラーにしない
+      if (!sha) return say({ removed: true, already: true }, 200, cors);
+
+      const del = await fetch(api, {
+        method: "DELETE",
+        headers: head,
+        body: JSON.stringify({ message: `ホームページを取り下げ: ${slug}`, branch, sha }),
+      });
+      if (!del.ok)
+        return say({ error: `消せませんでした（${del.status}）。少し待ってもう一度おためしください。` }, 502, cors);
+
+      return say({ removed: true }, 200, cors);
+    }
+
+    /* ───────── 出す ───────── */
+    const html = body?.html;
+    if (typeof html !== "string" || html.length < 50)
+      return say({ error: "ホームページの中身がありませんでした。" }, 400, cors);
+
+    // 大きさは「文字数」ではなく、実際のバイト数で見る。
+    // 日本語は1文字が3バイトになるので、文字数で見ると通してしまう
+    const bytes = new TextEncoder().encode(html);
+    const MAX = Number(env.MAX_BYTES || 6 * 1024 * 1024);
+    if (bytes.length > MAX)
+      return say({ error: "写真が多すぎます。枚数を減らすか、小さめの写真にしてください。" }, 413, cors);
 
     const put = await fetch(api, {
       method: "PUT",
       headers: head,
       body: JSON.stringify({
         message: `ホームページを公開: ${slug}`,
-        content: toBase64(html),
+        content: toBase64(bytes),
         branch,
         ...(sha ? { sha } : {}),
       }),
@@ -79,12 +102,18 @@ export default {
     if (!put.ok)
       return say({ error: `置けませんでした（${put.status}）。少し待ってもう一度おためしください。` }, 502, cors);
 
-    return say({
-      url: `https://${owner}.github.io/${repo}/${dir}/${slug}.html`,
-      updated: Boolean(sha),
-    }, 200, cors);
+    return say({ url: publicUrl(env, owner, repo, dir, slug), updated: Boolean(sha) }, 200, cors);
   },
 };
+
+/* 出来上がりのアドレス。
+   独自ドメイン(例 https://mise.roguepink.com)を使うときは
+   PUBLIC_BASE に入れる。入っていなければ github.io の住所になる */
+function publicUrl(env, owner, repo, dir, slug) {
+  const base = String(env.PUBLIC_BASE || "").replace(/\/+$/, "");
+  if (base) return `${base}/${dir}/${slug}.html`;
+  return `https://${owner}.github.io/${repo}/${dir}/${slug}.html`;
+}
 
 function say(obj, status, cors) {
   return new Response(JSON.stringify(obj), {
@@ -101,9 +130,8 @@ function same(a, b) {
   return diff === 0;
 }
 
-/* 日本語まじりの文字列を、GitHub が受け取れる形に直す */
-function toBase64(str) {
-  const bytes = new TextEncoder().encode(str);
+/* GitHub が受け取れる形に直す */
+function toBase64(bytes) {
   let bin = "";
   const STEP = 0x8000;
   for (let i = 0; i < bytes.length; i += STEP) {

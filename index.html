@@ -207,6 +207,19 @@ label.field input:focus, label.field textarea:focus{outline:none; border-color:v
 .fold[open] > summary{border-bottom:1px solid var(--line)}
 .fold-in{padding:16px 16px 18px}
 .way{margin:0 0 18px; padding:14px 15px; background:var(--bg); border-radius:14px; font-size:.86rem}
+
+/* ネットに出したページの一覧 */
+.pubrow{
+  display:flex; align-items:center; gap:10px; margin-bottom:9px;
+  padding:12px 13px; background:var(--bg); border-radius:14px;
+}
+.pubrow-t{min-width:0; flex:1}
+.pubrow-t b{display:block; font-size:.9rem}
+.pubrow-t a{
+  display:block; margin-top:3px; font-size:.72rem; color:var(--muted);
+  word-break:break-all; line-height:1.5;
+}
+.pubrow .pubdel{width:auto; flex:none; padding:10px 14px; font-size:.82rem}
 .way2{margin:0 0 12px; font-size:.86rem}
 
 footer.credit{margin-top:22px; font-size:.78rem; color:var(--muted); text-align:center}
@@ -464,11 +477,25 @@ footer.credit a{color:var(--pink)}
     </div>
     <p class="msg" id="erasemsg" role="status"></p>
 
-    <p class="way" style="margin:18px 0 12px"><b>ネットに出したページは、これでは消えません。</b><br>
-      上げたのは GitHub なので、消すのも GitHub の画面でやります。</p>
-    <button class="btn ghost" id="ghDel" type="button">GitHub の置き場所をひらく</button>
-    <div class="steps" id="ghDelSteps"></div>
-    <p class="note">消しても、1〜2分は見えたままのことがあります。少し待ってから確かめてください。</p>
+    <!-- ネットに出したページ。
+         ★ この一覧は「書いたものを、ぜんぶ消す」では消さない。
+            下書きを消しても、出したページはネットに残っているため。
+            ここで消さないかぎり、消えたことにしてはいけない -->
+    <div id="pubList" hidden>
+      <p class="way2" style="margin:20px 0 10px"><b>ネットに出したページ</b></p>
+      <div id="pubRows"></div>
+      <p class="msg" id="delmsg" role="status"></p>
+      <p class="note">消しても、1〜2分は見えたままのことがあります。少し待ってから確かめてください。</p>
+    </div>
+    <p class="note" id="pubNone" style="margin-top:20px">まだ、ネットには出していません。</p>
+
+    <div id="ghDelBox">
+      <p class="way" style="margin:18px 0 12px"><b>ネットに出したページは、これでは消えません。</b><br>
+        上げたのは GitHub なので、消すのも GitHub の画面でやります。</p>
+      <button class="btn ghost" id="ghDel" type="button">GitHub の置き場所をひらく</button>
+      <div class="steps" id="ghDelSteps"></div>
+      <p class="note">消しても、1〜2分は見えたままのことがあります。少し待ってから確かめてください。</p>
+    </div>
   </div>
 
   <footer class="credit">
@@ -1225,6 +1252,8 @@ async function publish(){
     $("liveUrl").textContent = data.url;
     $("openUrl").href = data.url;
     $("live").className = "done on";
+    // あとから消せるように、出したことを控えておく
+    pubAdd(slug, data.url);
     say("gomsg", data.updated ? "新しいものに入れ替えました" : "はじめて出しました");
     $("live").scrollIntoView({ behavior:"smooth", block:"nearest" });
   }catch(e){
@@ -1315,7 +1344,86 @@ $("undoBtn").addEventListener("click", () => {
   say("erasemsg", "元に戻しました");
 });
 
-/* 出したページを消す道。ここでは消せないので、GitHub の画面まで連れて行くだけ */
+/* ── ネットに出したページの控え ──
+   ★ 下書き(STORE_KEY)とは別の場所に持つ。
+      「書いたものを、ぜんぶ消す」で下書きが消えても、
+      ネットに出したページは残っている。控えまで消すと、
+      出したことを忘れて、消せないページが残ってしまう */
+const PUB_KEY = "nobobb.tsukuru.published.v1";
+
+function pubList(){
+  try{ const a = JSON.parse(localStorage.getItem(PUB_KEY)); return Array.isArray(a) ? a : []; }
+  catch(e){ return []; }
+}
+function pubSave(list){
+  try{ localStorage.setItem(PUB_KEY, JSON.stringify(list)); }catch(e){}
+}
+function pubAdd(slug, url){
+  const list = pubList().filter(x => x.slug !== slug);
+  list.unshift({ slug, url, name: S.name.trim(), at: Date.now() });
+  pubSave(list);
+  pubPaint();
+}
+function pubRemove(slug){
+  pubSave(pubList().filter(x => x.slug !== slug));
+  pubPaint();
+}
+
+function pubPaint(){
+  const list = pubList();
+  const has = list.length > 0;
+  // 窓口が繋がっているときだけ、アプリから消せる
+  $("pubList").hidden = !(has && autoOn());
+  $("pubNone").hidden = has || !autoOn();
+  $("ghDelBox").hidden = autoOn();
+  if (!has || !autoOn()) return;
+
+  $("pubRows").innerHTML = list.map(x => `
+    <div class="pubrow">
+      <div class="pubrow-t">
+        <b>${esc(x.name || x.slug)}</b>
+        <a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.url)}</a>
+      </div>
+      <button class="btn ghost danger pubdel" type="button" data-slug="${esc(x.slug)}">消す</button>
+    </div>`).join("");
+
+  $("pubRows").querySelectorAll(".pubdel").forEach(b => {
+    b.addEventListener("click", () => unpublish(b.dataset.slug, b));
+  });
+}
+
+/* 出したページを、窓口ごしに取り下げる。出すときと同じ合言葉を使う */
+async function unpublish(slug, btn){
+  const pass = (S.pass || "").trim() || (prompt("合言葉を入れてください") || "").trim();
+  if (!pass){ say("delmsg", "合言葉を入れてください"); return; }
+  if (!confirm(`「${slug}」をネットから消します。いいですか？\n\n端末の中の下書きは残ります。`)) return;
+
+  btn.disabled = true;
+  const label = btn.textContent;
+  btn.textContent = "消しています…";
+  try{
+    const res = await fetch(PUBLISH_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete", pass, slug }),
+    });
+    let data = {};
+    try{ data = await res.json(); }catch(e){}
+    if (!res.ok || !data.removed){
+      say("delmsg", data.error || "消せませんでした。少し待ってもう一度おためしください。");
+      btn.disabled = false; btn.textContent = label;
+      return;
+    }
+    pubRemove(slug);
+    // 「消えました」と言い切らない。ほんとうに見えなくなるまで少しかかる
+    say("delmsg", "取り下げました。1〜2分で見られなくなります");
+  }catch(e){
+    say("delmsg", "つながりませんでした。電波を確かめて、もう一度おためしください。");
+    btn.disabled = false; btn.textContent = label;
+  }
+}
+
+/* 窓口がないときの道。ここでは消せないので、GitHub の画面まで連れて行くだけ */
 $("ghDel").addEventListener("click", () => {
   const steps = $("ghDelSteps");
   steps.className = "steps on";
@@ -1361,6 +1469,7 @@ function setupPublish(){
 buildPickers();
 syncInputs();
 setupPublish();
+pubPaint();
 showUrl();
 paint(true);
 </script>
