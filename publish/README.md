@@ -64,9 +64,13 @@ https://github.com/settings/personal-access-tokens/new
 | **Expiration** | **1年**（無期限にしない。漏れたときに永久に使えてしまうため） |
 | **Repository access** | **Only select repositories** → 手順0で作った `omise` **だけ** |
 | **Permissions** → Repository permissions → **Contents** | **Read and write** |
+| **Permissions** → Repository permissions → **Metadata** | **Read-only**（自動で付く。そのままでいい） |
 
 `omise` と `mise` は似ています。**`omise` のほうです。**
 `Contents` が `Read` のままだと、置くことも消すこともできません。
+
+`Metadata` は GitHub が勝手に付けるもので、外せません。**そのままでいいです。**
+中身は「そのリポジトリがあるか、名前は何か」を見るだけで、ファイルの中身は読めません。
 
 決めたら、いちばん下の **Generate token** を押します。
 
