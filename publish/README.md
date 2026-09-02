@@ -45,16 +45,33 @@
 
 ### 1. GitHub の鍵をつくる
 
-1. GitHub → 右上のアイコン → **Settings**
-2. 左のいちばん下 **Developer settings**
-3. **Personal access tokens** → **Fine-grained tokens** → **Generate new token**
-4. 次のように決めます
-   - **Token name**: `tsukuru-publisher`（なんでもいい）
-   - **Expiration**: **1年**（無期限にしない。漏れたときに永久に使えてしまうため）
-   - **Repository access**: **Only select repositories** → 手順0で作った `omise` **だけ**をえらぶ
-   - **Permissions** → **Repository permissions** → **Contents** を **Read and write** に
-5. **Generate token** を押す
-6. **出てきた文字列をコピーする。この画面を閉じると二度と見られません。**
+**このアドレスを開くのが、いちばん早いです。**探さなくて済みます。
+
+```
+https://github.com/settings/personal-access-tokens/new
+```
+
+> **「Developer settings が見つからない」とき**
+> リポジトリの Settings を開いている可能性があります。Developer settings は、
+> **アカウントの** Settings（右上のアイコン → Settings → 左のいちばん下）にしかありません。
+> 上のアドレスを直接開けば、探す必要はありません。
+
+開いたら、次のように決めます。
+
+| 欄 | 入れるもの |
+|---|---|
+| **Token name** | `tsukuru-publisher`（なんでもいい） |
+| **Expiration** | **1年**（無期限にしない。漏れたときに永久に使えてしまうため） |
+| **Repository access** | **Only select repositories** → 手順0で作った `omise` **だけ** |
+| **Permissions** → Repository permissions → **Contents** | **Read and write** |
+
+`omise` と `mise` は似ています。**`omise` のほうです。**
+`Contents` が `Read` のままだと、置くことも消すこともできません。
+
+決めたら、いちばん下の **Generate token** を押します。
+
+**出てきた文字列をコピーしてください。この画面を閉じると二度と見られません。**
+（閉じてしまっても、作り直せば大丈夫です。古いほうは消してください。）
 
 > **この鍵は、誰にも見せないでください。**クロードにも貼らないでください。次の手順で Cloudflare の画面に直接貼ります。
 
