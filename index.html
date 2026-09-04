@@ -591,8 +591,14 @@ const PARTS = {
   area:"対応エリア", hours:"営業時間"
 };
 /* 公開の窓口。publish/README.md のとおりに設置して、ここにアドレスを入れる。
-   空のあいだは、ファイルを保存する形のままになる。 */
-let PUBLISH_API = "https://tsukuru-publisher.nakanointeria5963.workers.dev/";
+   空のあいだは、ファイルを保存する形のままになる。
+
+   ★ 2026-09-04 ノブさんの判断で、いったん空に戻した。
+      窓口そのものは動く形で置いてある(Cloudflare・鍵・omise はそのまま)。
+      ただ、合言葉が全員で1つしかないので、知らない人が開くと
+      合言葉の欄だけが出て、入れても弾かれる。それがいちばん悪い形だった。
+      誰が使うアプリなのかを決めてから、ここにアドレスを戻す。 */
+let PUBLISH_API = "";
 const BRANCH = "main";
 const STORE_KEY = "nobobb.tsukuru.v2";
 
